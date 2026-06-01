@@ -8,12 +8,20 @@ export const testUser = (req, res) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role, club } = req.body;
+    const { name, email, password, role, clubs, leaderClub } = req.body;
 
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
+    }
+
+    if (role === "student" && (!clubs || clubs.length === 0)) {
+      return res.status(400).json({ message: "Please select at least one club" });
+    }
+
+    if (role === "clubLeader" && !leaderClub) {
+      return res.status(400).json({ message: "Please select your club" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,7 +31,8 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      club,
+      clubs: role === "student" ? clubs : [],
+      leaderClub: role === "clubLeader" ? leaderClub : "",
     });
 
     res.status(201).json({
@@ -33,7 +42,8 @@ export const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        club: user.club,
+        clubs: user.clubs,
+        leaderClub: user.leaderClub,
       },
     });
   } catch (error) {
@@ -71,6 +81,8 @@ export const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        clubs: user.clubs,
+        leaderClub: user.leaderClub,
       },
     });
   } catch (error) {
