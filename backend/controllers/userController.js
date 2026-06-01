@@ -8,7 +8,7 @@ export const testUser = (req, res) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, club } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -23,6 +23,7 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      club,
     });
 
     res.status(201).json({
@@ -32,6 +33,7 @@ export const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        club: user.club,
       },
     });
   } catch (error) {
