@@ -6,17 +6,7 @@ import { Users, GraduationCap, ShieldCheck } from "lucide-react";
 function Register() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "student",
-    club: "",
-  });
-
-  const [message, setMessage] = useState("");
-
-  const clubs = [
+  const allClubs = [
     "IT Club",
     "IEEE Club",
     "Rotaract Club",
@@ -25,20 +15,55 @@ function Register() {
     "Art Circle",
   ];
 
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "student",
+    clubs: [],
+    leaderClub: "",
+  });
+
+  const [message, setMessage] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "role" && value === "student") {
-      setFormData({ ...formData, role: value, club: "" });
+    if (name === "role") {
+      setFormData({
+        ...formData,
+        role: value,
+        clubs: [],
+        leaderClub: "",
+      });
     } else {
       setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleClubCheckbox = (club) => {
+    if (formData.clubs.includes(club)) {
+      setFormData({
+        ...formData,
+        clubs: formData.clubs.filter((item) => item !== club),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        clubs: [...formData.clubs, club],
+      });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.role === "clubLeader" && !formData.club) {
+    if (formData.role === "student" && formData.clubs.length === 0) {
+      setMessage("Please select at least one club");
+      return;
+    }
+
+    if (formData.role === "clubLeader" && !formData.leaderClub) {
       setMessage("Please select your club");
       return;
     }
@@ -53,15 +78,13 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center px-6 relative overflow-hidden">
-      {/* Art Circles */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center px-6 py-10 relative overflow-hidden">
       <div className="absolute -top-20 -left-20 w-72 h-72 bg-orange-300 rounded-full opacity-30 blur-3xl"></div>
       <div className="absolute bottom-10 -right-20 w-80 h-80 bg-blue-300 rounded-full opacity-30 blur-3xl"></div>
       <div className="absolute top-1/3 right-1/4 w-32 h-32 bg-orange-400 rounded-full opacity-20 blur-2xl"></div>
       <div className="absolute bottom-1/4 left-1/4 w-28 h-28 bg-blue-400 rounded-full opacity-20 blur-2xl"></div>
 
       <div className="relative z-10 grid lg:grid-cols-2 bg-white shadow-2xl rounded-3xl overflow-hidden w-full max-w-5xl border border-blue-100">
-        {/* Left Section */}
         <div className="hidden lg:flex flex-col justify-center bg-blue-950 text-white p-12 relative overflow-hidden">
           <div className="absolute top-10 right-10 w-32 h-32 bg-orange-500 rounded-full opacity-20"></div>
           <div className="absolute bottom-10 left-10 w-40 h-40 bg-blue-500 rounded-full opacity-30"></div>
@@ -71,25 +94,24 @@ function Register() {
           </h1>
 
           <p className="text-blue-100 leading-8 mb-8">
-            Register as a student or club leader and start managing university
-            events, clubs, attendance, feedback and certificates professionally.
+            Students can join several clubs at once, while club leaders can
+            manage only their assigned club dashboard.
           </p>
 
           <div className="space-y-5">
-            <Info icon={<GraduationCap />} text="Students can register for events" />
-            <Info icon={<Users />} text="Club leaders can manage their own club" />
-            <Info icon={<ShieldCheck />} text="Admin is controlled separately" />
+            <Info icon={<GraduationCap />} text="Students can select multiple clubs" />
+            <Info icon={<Users />} text="Club leaders manage one selected club" />
+            <Info icon={<ShieldCheck />} text="Admin is created separately" />
           </div>
         </div>
 
-        {/* Form Section */}
         <div className="p-8 md:p-12">
           <h2 className="text-3xl font-extrabold text-blue-950 text-center mb-2">
             Create Account
           </h2>
 
           <p className="text-center text-slate-600 mb-6">
-            Select your role and complete registration
+            Select your role and club details
           </p>
 
           {message && (
@@ -136,16 +158,43 @@ function Register() {
               <option value="clubLeader">Club Leader</option>
             </select>
 
+            {formData.role === "student" && (
+              <div>
+                <p className="font-bold text-blue-950 mb-3">Select Clubs</p>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {allClubs.map((club) => (
+                    <label
+                      key={club}
+                      className={`border rounded-xl px-4 py-3 cursor-pointer text-sm font-semibold ${
+                        formData.clubs.includes(club)
+                          ? "bg-orange-500 text-white border-orange-500"
+                          : "bg-white text-blue-950 border-blue-100"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.clubs.includes(club)}
+                        onChange={() => handleClubCheckbox(club)}
+                        className="hidden"
+                      />
+                      {club}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {formData.role === "clubLeader" && (
               <select
-                name="club"
-                value={formData.club}
+                name="leaderClub"
+                value={formData.leaderClub}
                 onChange={handleChange}
                 required
                 className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
               >
                 <option value="">Select Your Club</option>
-                {clubs.map((club) => (
+                {allClubs.map((club) => (
                   <option key={club} value={club}>
                     {club}
                   </option>
