@@ -7,7 +7,7 @@ import userRoutes from "./routes/userRoutes.js";
 import clubRoutes from "./routes/clubRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import eventRegistrationRoutes from "./routes/eventRegistrationRoutes.js";
-
+import attendanceRoutes from "./routes/attendanceRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -21,7 +21,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/clubs", clubRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/event-registrations", eventRegistrationRoutes);
-
+app.use("/api/attendance", attendanceRoutes);
 
 app.get("/", (req, res) => {
   res.send("University Event & Club Management API is running...");

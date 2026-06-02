@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import EventRegistration from "../models/EventRegistration.js";
 
 export const registerForEvent = async (req, res) => {
@@ -15,12 +16,15 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
+    const qrToken = crypto.randomBytes(32).toString("hex");
+
     const registration = await EventRegistration.create({
       eventId,
       studentId,
       studentName,
       studentEmail,
       club,
+      qrToken,
     });
 
     res.status(201).json({

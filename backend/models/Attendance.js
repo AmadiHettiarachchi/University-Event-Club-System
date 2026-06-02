@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const eventRegistrationSchema = mongoose.Schema(
+const attendanceSchema = mongoose.Schema(
   {
     eventId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -29,15 +29,10 @@ const eventRegistrationSchema = mongoose.Schema(
       required: true,
     },
 
-    qrToken: {
+    status: {
       type: String,
-      required: true,
-      unique: true,
-    },
-
-    qrUsed: {
-      type: Boolean,
-      default: false,
+      enum: ["Present"],
+      default: "Present",
     },
   },
   {
@@ -45,9 +40,6 @@ const eventRegistrationSchema = mongoose.Schema(
   }
 );
 
-const EventRegistration = mongoose.model(
-  "EventRegistration",
-  eventRegistrationSchema
-);
+const Attendance = mongoose.model("Attendance", attendanceSchema);
 
-export default EventRegistration;
+export default Attendance;

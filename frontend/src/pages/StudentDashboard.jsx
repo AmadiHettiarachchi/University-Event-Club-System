@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { QRCodeCanvas } from "qrcode.react";
 
 function StudentDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [events, setEvents] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
   const [registeredEventIds, setRegisteredEventIds] = useState([]);
   const [message, setMessage] = useState("");
 
@@ -21,6 +23,7 @@ function StudentDashboard() {
     const ids = registrationRes.data.map((reg) => reg.eventId);
 
     setEvents(relevantEvents);
+    setRegistrations(registrationRes.data);
     setRegisteredEventIds(ids);
   };
 
@@ -50,14 +53,30 @@ function StudentDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
+  const getRegistration = (eventId) => {
+    return registrations.find((reg) => reg.eventId === eventId);
   };
 
   const isRegistered = (eventId) => {
     return registeredEventIds.includes(eventId);
+  };
+
+  const getQRValue = (eventId) => {
+    const registration = getRegistration(eventId);
+
+    if (!registration?.qrToken) {
+      return "";
+    }
+
+    return JSON.stringify({
+      qrToken: registration.qrToken,
+    });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
   };
 
   return (
@@ -107,44 +126,70 @@ function StudentDashboard() {
           </p>
         ) : (
           <div className="grid md:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <div
-                key={event._id}
-                className="bg-blue-50 rounded-2xl p-6 border border-blue-100"
-              >
-                <p className="text-orange-500 font-bold mb-2">{event.club}</p>
+            {events.map((event) => {
+              const registration = getRegistration(event._id);
 
-                <h3 className="text-xl font-extrabold text-blue-950 mb-2">
-                  {event.title}
-                </h3>
+              return (
+                <div
+                  key={event._id}
+                  className="bg-blue-50 rounded-2xl p-6 border border-blue-100"
+                >
+                  <p className="text-orange-500 font-bold mb-2">{event.club}</p>
 
-                <p className="text-slate-600 mb-3">{event.description}</p>
+                  <h3 className="text-xl font-extrabold text-blue-950 mb-2">
+                    {event.title}
+                  </h3>
 
-                <p className="text-sm text-slate-700">
-                  📍 <span className="font-bold">{event.venue}</span>
-                </p>
+                  <p className="text-slate-600 mb-3">{event.description}</p>
 
-                <p className="text-sm text-slate-700">
-                  📅 {new Date(event.date).toDateString()}
-                </p>
+                  <p className="text-sm text-slate-700">
+                    📍 <span className="font-bold">{event.venue}</span>
+                  </p>
 
-                {isRegistered(event._id) ? (
-                  <button
-                    disabled
-                    className="mt-4 bg-green-600 text-white px-5 py-2 rounded-xl font-bold cursor-not-allowed"
-                  >
-                    Registered ✅
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleRegisterEvent(event)}
-                    className="mt-4 bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
-                  >
-                    Register Event
-                  </button>
-                )}
-              </div>
-            ))}
+                  <p className="text-sm text-slate-700">
+                    📅 {new Date(event.date).toDateString()}
+                  </p>
+
+                  {isRegistered(event._id) ? (
+                    <div className="mt-4 bg-white rounded-2xl p-4 border border-blue-100 text-center">
+                      <p className="text-green-600 font-bold mb-3">
+                        Registered ✅
+                      </p>
+
+                      {registration?.qrUsed ? (
+                        <p className="text-red-500 font-bold">
+                          QR already used for attendance
+                        </p>
+                      ) : registration?.qrToken ? (
+                        <>
+                          <QRCodeCanvas
+                            value={getQRValue(event._id)}
+                            size={220}
+                            level="H"
+                            includeMargin={true}
+                          />
+
+                          <p className="text-xs text-slate-500 mt-3">
+                            Show this QR once for attendance
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-red-500 font-bold">
+                          QR token missing. Register again with a new event.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleRegisterEvent(event)}
+                      className="mt-4 bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+                    >
+                      Register Event
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

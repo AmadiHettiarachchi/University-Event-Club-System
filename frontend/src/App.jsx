@@ -8,7 +8,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CreateEvent from "./pages/CreateEvent";
 import EventPost from "./pages/EventPost";
 import EditEvent from "./pages/EditEvent";
-
+import MarkAttendance from "./pages/MarkAttendance";
 
 function App() {
   return (
@@ -22,6 +22,8 @@ function App() {
       <Route path="/create-event" element={<CreateEvent />} />
       <Route path="/event-post" element={<EventPost />} />
       <Route path="/edit-event/:id" element={<EditEvent />} />
+      <Route path="/mark-attendance" element={<MarkAttendance />} />
+
     </Routes>
   );
 }

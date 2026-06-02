@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, ArrowLeft } from "lucide-react";
 
 function CreateEvent() {
   const navigate = useNavigate();
@@ -27,6 +27,11 @@ function CreateEvent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.club) {
+      setMessage("Club name is missing. Please login again as a club leader.");
+      return;
+    }
+
     if (formData.date < today) {
       setMessage("You cannot select a previous date");
       return;
@@ -34,11 +39,12 @@ function CreateEvent() {
 
     try {
       const res = await axios.post("http://localhost:5000/api/events", formData);
+
       setMessage("Event created successfully!");
 
       setTimeout(() => {
         navigate("/event-post", { state: { event: res.data.event } });
-    }, 1000);
+      }, 1000);
     } catch (error) {
       setMessage(error.response?.data?.message || "Event creation failed");
     }
@@ -47,6 +53,14 @@ function CreateEvent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center px-6 py-10">
       <div className="bg-white shadow-2xl rounded-3xl w-full max-w-2xl p-8 border border-blue-100">
+        <Link
+          to="/club-leader-dashboard"
+          className="inline-flex items-center gap-2 text-blue-900 font-bold mb-6"
+        >
+          <ArrowLeft size={20} />
+          Back to Dashboard
+        </Link>
+
         <div className="flex justify-center mb-4">
           <div className="bg-orange-100 text-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center">
             <CalendarPlus size={34} />
@@ -59,7 +73,9 @@ function CreateEvent() {
 
         <p className="text-center text-slate-600 mb-6">
           Creating event for{" "}
-          <span className="font-bold text-orange-500">{user?.leaderClub}</span>
+          <span className="font-bold text-orange-500">
+            {formData.club || "No club selected"}
+          </span>
         </p>
 
         {message && (
@@ -111,7 +127,7 @@ function CreateEvent() {
 
           <input
             type="text"
-            value={user?.leaderClub}
+            value={formData.club || "Club name missing"}
             disabled
             className="w-full border border-blue-100 px-4 py-3 rounded-xl bg-blue-50 text-blue-950 font-bold"
           />

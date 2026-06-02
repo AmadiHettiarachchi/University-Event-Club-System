@@ -6,6 +6,7 @@ function ClubLeaderDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
+  const [attendance, setAttendance] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,8 +18,13 @@ function ClubLeaderDashboard() {
         `http://localhost:5000/api/event-registrations/club/${user?.leaderClub}`
       );
 
+      const attendanceRes = await axios.get(
+        `http://localhost:5000/api/attendance/club/${user?.leaderClub}`
+      );
+
       setEvents(eventRes.data);
       setRegistrations(registrationRes.data);
+      setAttendance(attendanceRes.data);
     };
 
     fetchData();
@@ -28,6 +34,10 @@ function ClubLeaderDashboard() {
     return registrations.filter(
       (registration) => registration.eventId?._id === eventId
     );
+  };
+
+  const getPresentStudents = (eventId) => {
+    return attendance.filter((item) => item.eventId?._id === eventId);
   };
 
   const handleLogout = () => {
@@ -67,15 +77,24 @@ function ClubLeaderDashboard() {
           </button>
         </div>
 
-        <Link
-          to="/create-event"
-          className="inline-block mt-6 bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600"
-        >
-          Create Event
-        </Link>
+        <div className="mt-6 flex gap-4">
+          <Link
+            to="/create-event"
+            className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600"
+          >
+            Create Event
+          </Link>
+
+          <Link
+            to="/mark-attendance"
+            className="bg-blue-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-800"
+          >
+            Mark Attendance
+          </Link>
+        </div>
 
         <h2 className="text-2xl font-extrabold text-blue-950 mt-10 mb-5">
-          Your Club Events & Registered Students
+          Your Club Events, Registrations & Attendance
         </h2>
 
         {events.length === 0 ? (
@@ -84,6 +103,7 @@ function ClubLeaderDashboard() {
           <div className="space-y-6">
             {events.map((event) => {
               const students = getRegisteredStudents(event._id);
+              const presentStudents = getPresentStudents(event._id);
 
               return (
                 <div
@@ -116,47 +136,84 @@ function ClubLeaderDashboard() {
                     </Link>
                   </div>
 
-                  <div className="mt-6 bg-white rounded-2xl p-5 border border-blue-100">
-                    <h4 className="text-lg font-extrabold text-orange-500 mb-4">
-                      Registered Students ({students.length})
-                    </h4>
+                  <div className="grid md:grid-cols-2 gap-6 mt-6">
+                    <div className="bg-white rounded-2xl p-5 border border-blue-100">
+                      <h4 className="text-lg font-extrabold text-orange-500 mb-4">
+                        Registered Students ({students.length})
+                      </h4>
 
-                    {students.length === 0 ? (
-                      <p className="text-slate-600">
-                        No students registered for this event yet.
-                      </p>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                          <thead>
-                            <tr className="text-blue-950 border-b">
-                              <th className="py-2">Student Name</th>
-                              <th className="py-2">Email</th>
-                              <th className="py-2">Registered Date</th>
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {students.map((student) => (
-                              <tr
-                                key={student._id}
-                                className="border-b text-slate-700"
-                              >
-                                <td className="py-3 font-semibold">
-                                  {student.studentName}
-                                </td>
-                                <td className="py-3">
-                                  {student.studentEmail}
-                                </td>
-                                <td className="py-3">
-                                  {new Date(student.createdAt).toDateString()}
-                                </td>
+                      {students.length === 0 ? (
+                        <p className="text-slate-600">
+                          No students registered for this event yet.
+                        </p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left">
+                            <thead>
+                              <tr className="text-blue-950 border-b">
+                                <th className="py-2">Name</th>
+                                <th className="py-2">Email</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+                            </thead>
+
+                            <tbody>
+                              {students.map((student) => (
+                                <tr
+                                  key={student._id}
+                                  className="border-b text-slate-700"
+                                >
+                                  <td className="py-3 font-semibold">
+                                    {student.studentName}
+                                  </td>
+                                  <td className="py-3">
+                                    {student.studentEmail}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-5 border border-blue-100">
+                      <h4 className="text-lg font-extrabold text-green-600 mb-4">
+                        Present Students ({presentStudents.length})
+                      </h4>
+
+                      {presentStudents.length === 0 ? (
+                        <p className="text-slate-600">
+                          No attendance marked yet.
+                        </p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left">
+                            <thead>
+                              <tr className="text-blue-950 border-b">
+                                <th className="py-2">Name</th>
+                                <th className="py-2">Email</th>
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              {presentStudents.map((student) => (
+                                <tr
+                                  key={student._id}
+                                  className="border-b text-slate-700"
+                                >
+                                  <td className="py-3 font-semibold">
+                                    {student.studentName}
+                                  </td>
+                                  <td className="py-3">
+                                    {student.studentEmail}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
