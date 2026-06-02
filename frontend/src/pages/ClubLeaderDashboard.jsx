@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Megaphone } from "lucide-react";
 
 function ClubLeaderDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -8,6 +9,7 @@ function ClubLeaderDashboard() {
   const [registrations, setRegistrations] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [feedback, setFeedback] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,32 +29,31 @@ function ClubLeaderDashboard() {
         `http://localhost:5000/api/feedback/club/${user?.leaderClub}`
       );
 
+      const announcementRes = await axios.get(
+        `http://localhost:5000/api/announcements/club/${user?.leaderClub}`
+      );
+
       setEvents(eventRes.data);
       setRegistrations(registrationRes.data);
       setAttendance(attendanceRes.data);
       setFeedback(feedbackRes.data);
+      setAnnouncements(announcementRes.data);
     };
 
     fetchData();
   }, []);
 
-  const getRegisteredStudents = (eventId) => {
-    return registrations.filter(
-      (registration) => registration.eventId?._id === eventId
-    );
-  };
+  const getRegisteredStudents = (eventId) =>
+    registrations.filter((reg) => reg.eventId?._id === eventId);
 
-  const getPresentStudents = (eventId) => {
-    return attendance.filter((item) => item.eventId?._id === eventId);
-  };
+  const getPresentStudents = (eventId) =>
+    attendance.filter((item) => item.eventId?._id === eventId);
 
-  const getEventFeedback = (eventId) => {
-    return feedback.filter((item) => item.eventId?._id === eventId);
-  };
+  const getEventFeedback = (eventId) =>
+    feedback.filter((item) => item.eventId?._id === eventId);
 
   const getAverageRating = (eventFeedback) => {
     if (eventFeedback.length === 0) return "0.0";
-
     const total = eventFeedback.reduce((sum, item) => sum + item.rating, 0);
     return (total / eventFeedback.length).toFixed(1);
   };
@@ -94,7 +95,7 @@ function ClubLeaderDashboard() {
           </button>
         </div>
 
-        <div className="mt-6 flex gap-4">
+        <div className="mt-6 flex flex-wrap gap-4">
           <Link
             to="/create-event"
             className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600"
@@ -108,6 +109,51 @@ function ClubLeaderDashboard() {
           >
             Mark Attendance
           </Link>
+
+          <Link
+            to="/create-announcement"
+            className="bg-orange-100 text-orange-600 px-6 py-3 rounded-xl font-bold hover:bg-orange-200"
+          >
+            Create Announcement
+          </Link>
+        </div>
+
+        <div className="mt-10 rounded-3xl bg-gradient-to-r from-orange-500 to-blue-900 p-1 shadow-xl">
+          <div className="bg-white rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="bg-orange-100 text-orange-500 w-12 h-12 rounded-2xl flex items-center justify-center">
+                <Megaphone size={26} />
+              </div>
+
+              <div>
+                <p className="text-orange-500 font-bold">Important Updates</p>
+                <h2 className="text-2xl font-extrabold text-blue-950">
+                  Club Announcements
+                </h2>
+              </div>
+            </div>
+
+            {announcements.length === 0 ? (
+              <p className="text-slate-600">No announcements created yet.</p>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {announcements.map((item) => (
+                  <div
+                    key={item._id}
+                    className="bg-orange-50 rounded-2xl p-5 border-l-4 border-orange-500 shadow-sm"
+                  >
+                    <h3 className="text-xl font-extrabold text-blue-950 mb-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-slate-600">{item.message}</p>
+                    <p className="text-xs text-slate-500 mt-3">
+                      {new Date(item.createdAt).toDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <h2 className="text-2xl font-extrabold text-blue-950 mt-10 mb-5">
@@ -163,31 +209,48 @@ function ClubLeaderDashboard() {
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-6 mt-6">
-                    <Section title={`Registered Students (${students.length})`} color="orange">
+                    <Section
+                      title={`Registered Students (${students.length})`}
+                      color="orange"
+                    >
                       {students.length === 0 ? (
                         <p className="text-slate-600">
                           No students registered yet.
                         </p>
                       ) : (
                         students.map((student) => (
-                          <Person key={student._id} name={student.studentName} email={student.studentEmail} />
+                          <Person
+                            key={student._id}
+                            name={student.studentName}
+                            email={student.studentEmail}
+                          />
                         ))
                       )}
                     </Section>
 
-                    <Section title={`Present Students (${presentStudents.length})`} color="green">
+                    <Section
+                      title={`Present Students (${presentStudents.length})`}
+                      color="green"
+                    >
                       {presentStudents.length === 0 ? (
                         <p className="text-slate-600">
                           No attendance marked yet.
                         </p>
                       ) : (
                         presentStudents.map((student) => (
-                          <Person key={student._id} name={student.studentName} email={student.studentEmail} />
+                          <Person
+                            key={student._id}
+                            name={student.studentName}
+                            email={student.studentEmail}
+                          />
                         ))
                       )}
                     </Section>
 
-                    <Section title={`Feedback (${eventFeedback.length})`} color="blue">
+                    <Section
+                      title={`Feedback (${eventFeedback.length})`}
+                      color="blue"
+                    >
                       {eventFeedback.length === 0 ? (
                         <p className="text-slate-600">No feedback yet.</p>
                       ) : (
@@ -227,9 +290,7 @@ function Section({ title, color, children }) {
 
   return (
     <div className="bg-white rounded-2xl p-5 border border-blue-100">
-      <h4 className={`text-lg font-extrabold mb-4 ${colorClass}`}>
-        {title}
-      </h4>
+      <h4 className={`text-lg font-extrabold mb-4 ${colorClass}`}>{title}</h4>
       <div className="space-y-3">{children}</div>
     </div>
   );

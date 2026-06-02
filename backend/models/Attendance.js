@@ -34,6 +34,11 @@ const attendanceSchema = mongoose.Schema(
       enum: ["Present"],
       default: "Present",
     },
+
+    certificateDownloaded: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

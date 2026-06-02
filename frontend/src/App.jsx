@@ -10,7 +10,7 @@ import EventPost from "./pages/EventPost";
 import EditEvent from "./pages/EditEvent";
 import MarkAttendance from "./pages/MarkAttendance";
 import SubmitFeedback from "./pages/SubmitFeedback";
-
+import CreateAnnouncement from "./pages/CreateAnnouncement";
 
 function App() {
   return (
@@ -26,7 +26,7 @@ function App() {
       <Route path="/edit-event/:id" element={<EditEvent />} />
       <Route path="/mark-attendance" element={<MarkAttendance />} />
       <Route path="/submit-feedback" element={<SubmitFeedback />} />
-
+      <Route path="/create-announcement" element={<CreateAnnouncement />} />
 
 
     </Routes>

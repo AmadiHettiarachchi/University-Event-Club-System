@@ -79,3 +79,31 @@ export const getAttendanceByStudent = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const markCertificateDownloaded = async (req, res) => {
+  try {
+    const { eventId, studentId } = req.body;
+
+    const attendance = await Attendance.findOne({ eventId, studentId });
+
+    if (!attendance) {
+      return res.status(404).json({ message: "Attendance record not found" });
+    }
+
+    if (attendance.certificateDownloaded) {
+      return res.status(400).json({
+        message: "Certificate already downloaded",
+      });
+    }
+
+    attendance.certificateDownloaded = true;
+    await attendance.save();
+
+    res.json({
+      message: "Certificate download recorded",
+      attendance,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
