@@ -7,6 +7,7 @@ function ClubLeaderDashboard() {
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [attendance, setAttendance] = useState([]);
+  const [feedback, setFeedback] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,9 +23,14 @@ function ClubLeaderDashboard() {
         `http://localhost:5000/api/attendance/club/${user?.leaderClub}`
       );
 
+      const feedbackRes = await axios.get(
+        `http://localhost:5000/api/feedback/club/${user?.leaderClub}`
+      );
+
       setEvents(eventRes.data);
       setRegistrations(registrationRes.data);
       setAttendance(attendanceRes.data);
+      setFeedback(feedbackRes.data);
     };
 
     fetchData();
@@ -38,6 +44,17 @@ function ClubLeaderDashboard() {
 
   const getPresentStudents = (eventId) => {
     return attendance.filter((item) => item.eventId?._id === eventId);
+  };
+
+  const getEventFeedback = (eventId) => {
+    return feedback.filter((item) => item.eventId?._id === eventId);
+  };
+
+  const getAverageRating = (eventFeedback) => {
+    if (eventFeedback.length === 0) return "0.0";
+
+    const total = eventFeedback.reduce((sum, item) => sum + item.rating, 0);
+    return (total / eventFeedback.length).toFixed(1);
   };
 
   const handleLogout = () => {
@@ -94,7 +111,7 @@ function ClubLeaderDashboard() {
         </div>
 
         <h2 className="text-2xl font-extrabold text-blue-950 mt-10 mb-5">
-          Your Club Events, Registrations & Attendance
+          Your Club Events, Registrations, Attendance & Feedback
         </h2>
 
         {events.length === 0 ? (
@@ -104,6 +121,8 @@ function ClubLeaderDashboard() {
             {events.map((event) => {
               const students = getRegisteredStudents(event._id);
               const presentStudents = getPresentStudents(event._id);
+              const eventFeedback = getEventFeedback(event._id);
+              const avgRating = getAverageRating(eventFeedback);
 
               return (
                 <div
@@ -125,6 +144,13 @@ function ClubLeaderDashboard() {
                       <p className="text-sm text-slate-700">
                         📅 {new Date(event.date).toDateString()}
                       </p>
+
+                      <p className="text-sm text-slate-700 mt-2">
+                        ⭐ Average Rating:{" "}
+                        <span className="font-bold text-orange-500">
+                          {avgRating}/5
+                        </span>
+                      </p>
                     </div>
 
                     <Link
@@ -136,84 +162,50 @@ function ClubLeaderDashboard() {
                     </Link>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6 mt-6">
-                    <div className="bg-white rounded-2xl p-5 border border-blue-100">
-                      <h4 className="text-lg font-extrabold text-orange-500 mb-4">
-                        Registered Students ({students.length})
-                      </h4>
-
+                  <div className="grid md:grid-cols-3 gap-6 mt-6">
+                    <Section title={`Registered Students (${students.length})`} color="orange">
                       {students.length === 0 ? (
                         <p className="text-slate-600">
-                          No students registered for this event yet.
+                          No students registered yet.
                         </p>
                       ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left">
-                            <thead>
-                              <tr className="text-blue-950 border-b">
-                                <th className="py-2">Name</th>
-                                <th className="py-2">Email</th>
-                              </tr>
-                            </thead>
-
-                            <tbody>
-                              {students.map((student) => (
-                                <tr
-                                  key={student._id}
-                                  className="border-b text-slate-700"
-                                >
-                                  <td className="py-3 font-semibold">
-                                    {student.studentName}
-                                  </td>
-                                  <td className="py-3">
-                                    {student.studentEmail}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                        students.map((student) => (
+                          <Person key={student._id} name={student.studentName} email={student.studentEmail} />
+                        ))
                       )}
-                    </div>
+                    </Section>
 
-                    <div className="bg-white rounded-2xl p-5 border border-blue-100">
-                      <h4 className="text-lg font-extrabold text-green-600 mb-4">
-                        Present Students ({presentStudents.length})
-                      </h4>
-
+                    <Section title={`Present Students (${presentStudents.length})`} color="green">
                       {presentStudents.length === 0 ? (
                         <p className="text-slate-600">
                           No attendance marked yet.
                         </p>
                       ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left">
-                            <thead>
-                              <tr className="text-blue-950 border-b">
-                                <th className="py-2">Name</th>
-                                <th className="py-2">Email</th>
-                              </tr>
-                            </thead>
-
-                            <tbody>
-                              {presentStudents.map((student) => (
-                                <tr
-                                  key={student._id}
-                                  className="border-b text-slate-700"
-                                >
-                                  <td className="py-3 font-semibold">
-                                    {student.studentName}
-                                  </td>
-                                  <td className="py-3">
-                                    {student.studentEmail}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                        presentStudents.map((student) => (
+                          <Person key={student._id} name={student.studentName} email={student.studentEmail} />
+                        ))
                       )}
-                    </div>
+                    </Section>
+
+                    <Section title={`Feedback (${eventFeedback.length})`} color="blue">
+                      {eventFeedback.length === 0 ? (
+                        <p className="text-slate-600">No feedback yet.</p>
+                      ) : (
+                        eventFeedback.map((item) => (
+                          <div key={item._id} className="border-b py-3">
+                            <p className="font-bold text-blue-950">
+                              {item.studentName}
+                            </p>
+                            <p className="text-sm text-orange-500 font-bold">
+                              Rating: {item.rating}/5
+                            </p>
+                            <p className="text-sm text-slate-600 mt-1">
+                              {item.comment}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </Section>
                   </div>
                 </div>
               );
@@ -221,6 +213,33 @@ function ClubLeaderDashboard() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function Section({ title, color, children }) {
+  const colorClass =
+    color === "orange"
+      ? "text-orange-500"
+      : color === "green"
+      ? "text-green-600"
+      : "text-blue-900";
+
+  return (
+    <div className="bg-white rounded-2xl p-5 border border-blue-100">
+      <h4 className={`text-lg font-extrabold mb-4 ${colorClass}`}>
+        {title}
+      </h4>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function Person({ name, email }) {
+  return (
+    <div className="border-b pb-2">
+      <p className="font-semibold text-blue-950">{name}</p>
+      <p className="text-sm text-slate-600">{email}</p>
     </div>
   );
 }

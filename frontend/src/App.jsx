@@ -9,6 +9,8 @@ import CreateEvent from "./pages/CreateEvent";
 import EventPost from "./pages/EventPost";
 import EditEvent from "./pages/EditEvent";
 import MarkAttendance from "./pages/MarkAttendance";
+import SubmitFeedback from "./pages/SubmitFeedback";
+
 
 function App() {
   return (
@@ -23,6 +25,9 @@ function App() {
       <Route path="/event-post" element={<EventPost />} />
       <Route path="/edit-event/:id" element={<EditEvent />} />
       <Route path="/mark-attendance" element={<MarkAttendance />} />
+      <Route path="/submit-feedback" element={<SubmitFeedback />} />
+
+
 
     </Routes>
   );

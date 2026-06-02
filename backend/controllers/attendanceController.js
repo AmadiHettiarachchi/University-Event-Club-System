@@ -65,3 +65,17 @@ export const getAttendanceByClub = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getAttendanceByStudent = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const attendance = await Attendance.find({ studentId }).sort({
+      createdAt: -1,
+    });
+
+    res.json(attendance);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

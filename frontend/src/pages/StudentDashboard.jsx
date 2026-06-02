@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { QRCodeCanvas } from "qrcode.react";
+import { Link } from "react-router-dom";
 
 function StudentDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [registeredEventIds, setRegisteredEventIds] = useState([]);
+  const [attendance, setAttendance] = useState([]);
   const [message, setMessage] = useState("");
 
   const fetchData = async () => {
@@ -20,11 +22,16 @@ function StudentDashboard() {
       `http://localhost:5000/api/event-registrations/student/${user.id}`
     );
 
+    const attendanceRes = await axios.get(
+      `http://localhost:5000/api/attendance/student/${user.id}`
+    );
+
     const ids = registrationRes.data.map((reg) => reg.eventId);
 
     setEvents(relevantEvents);
     setRegistrations(registrationRes.data);
     setRegisteredEventIds(ids);
+    setAttendance(attendanceRes.data);
   };
 
   useEffect(() => {
@@ -59,6 +66,10 @@ function StudentDashboard() {
 
   const isRegistered = (eventId) => {
     return registeredEventIds.includes(eventId);
+  };
+
+  const isPresent = (eventId) => {
+    return attendance.some((item) => item.eventId === eventId);
   };
 
   const getQRValue = (eventId) => {
@@ -177,6 +188,16 @@ function StudentDashboard() {
                         <p className="text-red-500 font-bold">
                           QR token missing. Register again with a new event.
                         </p>
+                      )}
+
+                      {isPresent(event._id) && (
+                        <Link
+                          to="/submit-feedback"
+                          state={{ event }}
+                          className="inline-block mt-4 bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
+                        >
+                          Submit Feedback
+                        </Link>
                       )}
                     </div>
                   ) : (
