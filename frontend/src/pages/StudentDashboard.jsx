@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { QRCodeCanvas } from "qrcode.react";
 import { Link } from "react-router-dom";
+import jsPDF from "jspdf";
 
 function StudentDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -83,6 +84,79 @@ function StudentDashboard() {
       qrToken: registration.qrToken,
     });
   };
+
+ const downloadCertificate = (event) => {
+  const doc = new jsPDF("landscape");
+
+  // Background
+  doc.setFillColor(240, 248, 255);
+  doc.rect(0, 0, 297, 210, "F");
+
+  // Border
+  doc.setDrawColor(30, 58, 138);
+  doc.setLineWidth(3);
+  doc.rect(10, 10, 277, 190);
+
+  doc.setDrawColor(249, 115, 22);
+  doc.setLineWidth(1.5);
+  doc.rect(16, 16, 265, 178);
+
+  // Decorative circles
+  doc.setFillColor(249, 115, 22);
+  doc.circle(35, 35, 14, "F");
+
+  doc.setFillColor(30, 58, 138);
+  doc.circle(262, 175, 18, "F");
+
+  // Title
+  doc.setFont("times", "bold");
+  doc.setTextColor(30, 58, 138);
+  doc.setFontSize(32);
+  doc.text("Certificate of Participation", 148, 42, { align: "center" });
+
+  doc.setDrawColor(249, 115, 22);
+  doc.line(85, 50, 212, 50);
+
+  doc.setFont("times", "normal");
+  doc.setTextColor(80, 80, 80);
+  doc.setFontSize(16);
+  doc.text("This certificate is proudly presented to", 148, 70, {
+    align: "center",
+  });
+
+  doc.setFont("times", "bold");
+  doc.setTextColor(249, 115, 22);
+  doc.setFontSize(30);
+  doc.text(user.name, 148, 94, { align: "center" });
+
+  doc.setFont("times", "normal");
+  doc.setTextColor(80, 80, 80);
+  doc.setFontSize(16);
+  doc.text("for successfully participating in", 148, 115, {
+    align: "center",
+  });
+
+  doc.setFont("times", "bold");
+  doc.setTextColor(30, 58, 138);
+  doc.setFontSize(24);
+  doc.text(event.title, 148, 137, { align: "center" });
+
+  doc.setFont("times", "normal");
+  doc.setTextColor(60, 60, 60);
+  doc.setFontSize(14);
+  doc.text(`Organized by: ${event.club}`, 148, 155, { align: "center" });
+  doc.text(`Venue: ${event.venue}`, 148, 167, { align: "center" });
+  doc.text(`Date: ${new Date(event.date).toDateString()}`, 148, 179, {
+    align: "center",
+  });
+
+  doc.setFont("times", "bold");
+  doc.setTextColor(30, 58, 138);
+  doc.setFontSize(16);
+  doc.text("UniClubs", 148, 197, { align: "center" });
+
+  doc.save(`${event.title}-${user.name}-certificate.pdf`);
+};
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -191,13 +265,22 @@ function StudentDashboard() {
                       )}
 
                       {isPresent(event._id) && (
-                        <Link
-                          to="/submit-feedback"
-                          state={{ event }}
-                          className="inline-block mt-4 bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
-                        >
-                          Submit Feedback
-                        </Link>
+                        <div className="mt-4 flex flex-col gap-3">
+                          <Link
+                            to="/submit-feedback"
+                            state={{ event }}
+                            className="bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
+                          >
+                            Submit Feedback
+                          </Link>
+
+                          <button
+                            onClick={() => downloadCertificate(event)}
+                            className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+                          >
+                            Download Certificate
+                          </button>
+                        </div>
                       )}
                     </div>
                   ) : (
