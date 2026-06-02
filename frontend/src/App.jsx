@@ -13,6 +13,7 @@ import MarkAttendance from "./pages/MarkAttendance";
 import SubmitFeedback from "./pages/SubmitFeedback";
 import CreateAnnouncement from "./pages/CreateAnnouncement";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -101,7 +102,11 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
+    
+
   );
 }
 
