@@ -10,7 +10,9 @@ export const registerForEvent = async (req, res) => {
     });
 
     if (alreadyRegistered) {
-      return res.status(400).json({ message: "You already registered for this event" });
+      return res.status(400).json({
+        message: "You already registered for this event",
+      });
     }
 
     const registration = await EventRegistration.create({
@@ -37,6 +39,20 @@ export const getRegistrationsByClub = async (req, res) => {
     const registrations = await EventRegistration.find({ club })
       .populate("eventId", "title date venue")
       .sort({ createdAt: -1 });
+
+    res.json(registrations);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getRegistrationsByStudent = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const registrations = await EventRegistration.find({ studentId }).sort({
+      createdAt: -1,
+    });
 
     res.json(registrations);
   } catch (error) {

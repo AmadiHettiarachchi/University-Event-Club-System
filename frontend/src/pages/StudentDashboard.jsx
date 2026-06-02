@@ -4,20 +4,28 @@ import axios from "axios";
 function StudentDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [events, setEvents] = useState([]);
+  const [registeredEventIds, setRegisteredEventIds] = useState([]);
   const [message, setMessage] = useState("");
 
+  const fetchData = async () => {
+    const eventRes = await axios.get("http://localhost:5000/api/events");
+
+    const relevantEvents = eventRes.data.filter((event) =>
+      user?.clubs?.includes(event.club)
+    );
+
+    const registrationRes = await axios.get(
+      `http://localhost:5000/api/event-registrations/student/${user.id}`
+    );
+
+    const ids = registrationRes.data.map((reg) => reg.eventId);
+
+    setEvents(relevantEvents);
+    setRegisteredEventIds(ids);
+  };
+
   useEffect(() => {
-    const fetchEvents = async () => {
-      const res = await axios.get("http://localhost:5000/api/events");
-
-      const relevantEvents = res.data.filter((event) =>
-        user?.clubs?.includes(event.club)
-      );
-
-      setEvents(relevantEvents);
-    };
-
-    fetchEvents();
+    fetchData();
   }, []);
 
   const handleRegisterEvent = async (event) => {
@@ -36,6 +44,7 @@ function StudentDashboard() {
       );
 
       setMessage(res.data.message);
+      fetchData();
     } catch (error) {
       setMessage(error.response?.data?.message || "Registration failed");
     }
@@ -45,6 +54,10 @@ function StudentDashboard() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "/login";
+  };
+
+  const isRegistered = (eventId) => {
+    return registeredEventIds.includes(eventId);
   };
 
   return (
@@ -89,7 +102,9 @@ function StudentDashboard() {
         </h2>
 
         {events.length === 0 ? (
-          <p className="text-slate-600">No events available for your clubs yet.</p>
+          <p className="text-slate-600">
+            No events available for your clubs yet.
+          </p>
         ) : (
           <div className="grid md:grid-cols-3 gap-6">
             {events.map((event) => (
@@ -113,12 +128,21 @@ function StudentDashboard() {
                   📅 {new Date(event.date).toDateString()}
                 </p>
 
-                <button
-                  onClick={() => handleRegisterEvent(event)}
-                  className="mt-4 bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
-                >
-                  Register Event
-                </button>
+                {isRegistered(event._id) ? (
+                  <button
+                    disabled
+                    className="mt-4 bg-green-600 text-white px-5 py-2 rounded-xl font-bold cursor-not-allowed"
+                  >
+                    Registered ✅
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleRegisterEvent(event)}
+                    className="mt-4 bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+                  >
+                    Register Event
+                  </button>
+                )}
               </div>
             ))}
           </div>
