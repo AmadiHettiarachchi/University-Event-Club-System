@@ -12,16 +12,27 @@ import {
 
 function AdminDashboard() {
   const [stats, setStats] = useState({});
+  const [users, setUsers] = useState([]);
+  const [events, setEvents] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    const fetchStats = async () => {
-      const res = await axios.get("http://localhost:5000/api/admin/stats");
-      setStats(res.data);
+    const fetchAdminData = async () => {
+      const statsRes = await axios.get("http://localhost:5000/api/admin/stats");
+      const usersRes = await axios.get("http://localhost:5000/api/admin/users");
+      const eventsRes = await axios.get("http://localhost:5000/api/admin/events");
+
+      setStats(statsRes.data);
+      setUsers(usersRes.data);
+      setEvents(eventsRes.data);
     };
 
-    fetchStats();
+    fetchAdminData();
   }, []);
+
+  const students = users.filter((item) => item.role === "student");
+  const clubLeaders = users.filter((item) => item.role === "clubLeader");
+  const admins = users.filter((item) => item.role === "admin");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -55,48 +66,115 @@ function AdminDashboard() {
         </div>
 
         <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <StatCard
-            icon={<Users />}
-            title="Total Students"
-            value={stats.totalStudents}
-          />
-
-          <StatCard
-            icon={<UserCheck />}
-            title="Club Leaders"
-            value={stats.totalClubLeaders}
-          />
-
-          <StatCard
-            icon={<CalendarDays />}
-            title="Events"
-            value={stats.totalEvents}
-          />
-
-          <StatCard
-            icon={<ClipboardList />}
-            title="Registrations"
-            value={stats.totalRegistrations}
-          />
-
-          <StatCard
-            icon={<CheckCircle />}
-            title="Attendance"
-            value={stats.totalAttendance}
-          />
-
-          <StatCard
-            icon={<MessageSquare />}
-            title="Feedback"
-            value={stats.totalFeedback}
-          />
-
-          <StatCard
-            icon={<Megaphone />}
-            title="Announcements"
-            value={stats.totalAnnouncements}
-          />
+          <StatCard icon={<Users />} title="Total Students" value={stats.totalStudents} />
+          <StatCard icon={<UserCheck />} title="Club Leaders" value={stats.totalClubLeaders} />
+          <StatCard icon={<CalendarDays />} title="Events" value={stats.totalEvents} />
+          <StatCard icon={<ClipboardList />} title="Registrations" value={stats.totalRegistrations} />
+          <StatCard icon={<CheckCircle />} title="Attendance" value={stats.totalAttendance} />
+          <StatCard icon={<MessageSquare />} title="Feedback" value={stats.totalFeedback} />
+          <StatCard icon={<Megaphone />} title="Announcements" value={stats.totalAnnouncements} />
         </div>
+
+        <UserSection
+          title={`Students (${students.length})`}
+          users={students}
+          type="student"
+        />
+
+        <UserSection
+          title={`Club Leaders (${clubLeaders.length})`}
+          users={clubLeaders}
+          type="leader"
+        />
+
+        <UserSection
+          title={`Admin (${admins.length})`}
+          users={admins}
+          type="admin"
+        />
+
+        <h2 className="text-2xl font-extrabold text-blue-950 mt-12 mb-5">
+          All Events
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {events.length === 0 ? (
+            <p className="text-slate-600">No events found.</p>
+          ) : (
+            events.map((event) => (
+              <div
+                key={event._id}
+                className="bg-orange-50 rounded-2xl p-6 border border-orange-100"
+              >
+                <p className="text-orange-500 font-bold mb-2">{event.club}</p>
+
+                <h3 className="text-xl font-extrabold text-blue-950 mb-2">
+                  {event.title}
+                </h3>
+
+                <p className="text-slate-600 mb-3">{event.description}</p>
+
+                <p className="text-sm text-slate-700">
+                  📍 <span className="font-bold">{event.venue}</span>
+                </p>
+
+                <p className="text-sm text-slate-700">
+                  📅 {new Date(event.date).toDateString()}
+                </p>
+
+                <p className="text-xs text-slate-500 mt-3">
+                  Created by: {event.createdBy}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UserSection({ title, users, type }) {
+  return (
+    <div className="mt-12">
+      <h2 className="text-2xl font-extrabold text-blue-950 mb-5">{title}</h2>
+
+      <div className="overflow-x-auto bg-blue-50 rounded-2xl p-5 border border-blue-100">
+        {users.length === 0 ? (
+          <p className="text-slate-600">No users found.</p>
+        ) : (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="text-blue-950 border-b">
+                <th className="py-3">Name</th>
+                <th className="py-3">Email</th>
+                <th className="py-3">
+                  {type === "student"
+                    ? "Joined Clubs"
+                    : type === "leader"
+                    ? "Managing Club"
+                    : "Role"}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {users.map((item) => (
+                <tr key={item._id} className="border-b text-slate-700">
+                  <td className="py-3 font-semibold">{item.name}</td>
+                  <td className="py-3">{item.email}</td>
+                  <td className="py-3">
+                    {type === "student"
+                      ? item.clubs?.join(", ")
+                      : type === "leader"
+                      ? item.leaderClub
+                      : "System Admin"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

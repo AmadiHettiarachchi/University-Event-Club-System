@@ -28,3 +28,21 @@ export const getAdminStats = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find().sort({ createdAt: -1 });
+    res.json(events);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
