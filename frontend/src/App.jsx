@@ -6,6 +6,9 @@ import StudentDashboard from "./pages/StudentDashboard";
 import ClubLeaderDashboard from "./pages/ClubLeaderDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateEvent from "./pages/CreateEvent";
+import EventPost from "./pages/EventPost";
+import EditEvent from "./pages/EditEvent";
+
 
 function App() {
   return (
@@ -17,6 +20,8 @@ function App() {
       <Route path="/club-leader-dashboard" element={<ClubLeaderDashboard />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
       <Route path="/create-event" element={<CreateEvent />} />
+      <Route path="/event-post" element={<EventPost />} />
+      <Route path="/edit-event/:id" element={<EditEvent />} />
     </Routes>
   );
 }

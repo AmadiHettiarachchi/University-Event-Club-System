@@ -1,24 +1,29 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { CalendarPlus } from "lucide-react";
+import { Pencil } from "lucide-react";
 
-function CreateEvent() {
+function EditEvent() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const location = useLocation();
+  const event = location.state?.event;
 
   const today = new Date().toISOString().split("T")[0];
 
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    venue: "",
-    date: "",
-    club: user?.leaderClub || "",
-    createdBy: user?.name || "",
+    title: event?.title || "",
+    description: event?.description || "",
+    venue: event?.venue || "",
+    date: event?.date ? event.date.split("T")[0] : "",
+    club: event?.club || "",
+    createdBy: event?.createdBy || "",
   });
 
   const [message, setMessage] = useState("");
+
+  if (!event) {
+    return <p className="p-10">No event selected.</p>;
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,14 +38,18 @@ function CreateEvent() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/events", formData);
-      setMessage("Event created successfully!");
+      const res = await axios.put(
+       `http://localhost:5000/api/events/${event._id}`,
+        formData
+    );
 
-      setTimeout(() => {
-        navigate("/event-post", { state: { event: res.data.event } });
+    setMessage("Event updated successfully!");
+
+    setTimeout(() => {
+      navigate("/event-post", { state: { event: res.data.event } });
     }, 1000);
     } catch (error) {
-      setMessage(error.response?.data?.message || "Event creation failed");
+      setMessage(error.response?.data?.message || "Event update failed");
     }
   };
 
@@ -49,17 +58,17 @@ function CreateEvent() {
       <div className="bg-white shadow-2xl rounded-3xl w-full max-w-2xl p-8 border border-blue-100">
         <div className="flex justify-center mb-4">
           <div className="bg-orange-100 text-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center">
-            <CalendarPlus size={34} />
+            <Pencil size={34} />
           </div>
         </div>
 
         <h1 className="text-3xl font-extrabold text-blue-950 text-center mb-2">
-          Create New Event
+          Edit Event
         </h1>
 
         <p className="text-center text-slate-600 mb-6">
-          Creating event for{" "}
-          <span className="font-bold text-orange-500">{user?.leaderClub}</span>
+          Updating event for{" "}
+          <span className="font-bold text-orange-500">{formData.club}</span>
         </p>
 
         {message && (
@@ -111,7 +120,7 @@ function CreateEvent() {
 
           <input
             type="text"
-            value={user?.leaderClub}
+            value={formData.club}
             disabled
             className="w-full border border-blue-100 px-4 py-3 rounded-xl bg-blue-50 text-blue-950 font-bold"
           />
@@ -120,7 +129,7 @@ function CreateEvent() {
             type="submit"
             className="w-full bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600 shadow-lg"
           >
-            Create Event
+            Update Event
           </button>
         </form>
       </div>
@@ -128,4 +137,4 @@ function CreateEvent() {
   );
 }
 
-export default CreateEvent;
+export default EditEvent;
