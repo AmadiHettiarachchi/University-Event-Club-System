@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function ClubLeaderDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -18,6 +20,13 @@ function ClubLeaderDashboard() {
           </span>
           .
         </p>
+
+        <Link
+          to="/create-event"
+          className="inline-block mt-6 bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600"
+        >
+          Create Event
+        </Link>
 
         <div className="grid md:grid-cols-3 gap-6 mt-8">
           <Card title="Create Events" text="Add and manage events for your club." />

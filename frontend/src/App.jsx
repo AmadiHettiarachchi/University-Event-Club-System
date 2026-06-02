@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import StudentDashboard from "./pages/StudentDashboard";
 import ClubLeaderDashboard from "./pages/ClubLeaderDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import CreateEvent from "./pages/CreateEvent";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/student-dashboard" element={<StudentDashboard />} />
       <Route path="/club-leader-dashboard" element={<ClubLeaderDashboard />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/create-event" element={<CreateEvent />} />
     </Routes>
   );
 }

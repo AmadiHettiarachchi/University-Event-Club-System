@@ -4,6 +4,8 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 
 import userRoutes from "./routes/userRoutes.js";
+import clubRoutes from "./routes/clubRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -14,6 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
+app.use("/api/clubs", clubRoutes);
+app.use("/api/events", eventRoutes);
 
 app.get("/", (req, res) => {
   res.send("University Event & Club Management API is running...");
