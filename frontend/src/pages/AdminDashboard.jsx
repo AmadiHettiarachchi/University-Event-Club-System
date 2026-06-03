@@ -16,23 +16,55 @@ function AdminDashboard() {
   const [events, setEvents] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
 
+  const fetchAdminData = async () => {
+    const statsRes = await axios.get("http://localhost:5000/api/admin/stats");
+    const usersRes = await axios.get("http://localhost:5000/api/admin/users");
+    const eventsRes = await axios.get("http://localhost:5000/api/admin/events");
+
+    setStats(statsRes.data);
+    setUsers(usersRes.data);
+    setEvents(eventsRes.data);
+  };
+
   useEffect(() => {
-    const fetchAdminData = async () => {
-      const statsRes = await axios.get("http://localhost:5000/api/admin/stats");
-      const usersRes = await axios.get("http://localhost:5000/api/admin/users");
-      const eventsRes = await axios.get("http://localhost:5000/api/admin/events");
-
-      setStats(statsRes.data);
-      setUsers(usersRes.data);
-      setEvents(eventsRes.data);
-    };
-
     fetchAdminData();
   }, []);
 
   const students = users.filter((item) => item.role === "student");
   const clubLeaders = users.filter((item) => item.role === "clubLeader");
   const admins = users.filter((item) => item.role === "admin");
+
+  const deleteUser = async (userId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this user?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/admin/users/${userId}`);
+      alert("User deleted successfully");
+      fetchAdminData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to delete user");
+    }
+  };
+
+  const deleteEvent = async (eventId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this event?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/admin/events/${eventId}`);
+      alert("Event deleted successfully");
+      fetchAdminData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to delete event");
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -79,18 +111,21 @@ function AdminDashboard() {
           title={`Students (${students.length})`}
           users={students}
           type="student"
+          deleteUser={deleteUser}
         />
 
         <UserSection
           title={`Club Leaders (${clubLeaders.length})`}
           users={clubLeaders}
           type="leader"
+          deleteUser={deleteUser}
         />
 
         <UserSection
           title={`Admin (${admins.length})`}
           users={admins}
           type="admin"
+          deleteUser={deleteUser}
         />
 
         <h2 className="text-2xl font-extrabold text-blue-950 mt-12 mb-5">
@@ -125,6 +160,13 @@ function AdminDashboard() {
                 <p className="text-xs text-slate-500 mt-3">
                   Created by: {event.createdBy}
                 </p>
+
+                <button
+                  onClick={() => deleteEvent(event._id)}
+                  className="mt-4 bg-red-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-red-600"
+                >
+                  Delete Event
+                </button>
               </div>
             ))
           )}
@@ -134,7 +176,7 @@ function AdminDashboard() {
   );
 }
 
-function UserSection({ title, users, type }) {
+function UserSection({ title, users, type, deleteUser }) {
   return (
     <div className="mt-12">
       <h2 className="text-2xl font-extrabold text-blue-950 mb-5">{title}</h2>
@@ -155,6 +197,7 @@ function UserSection({ title, users, type }) {
                     ? "Managing Club"
                     : "Role"}
                 </th>
+                <th className="py-3">Actions</th>
               </tr>
             </thead>
 
@@ -169,6 +212,20 @@ function UserSection({ title, users, type }) {
                       : type === "leader"
                       ? item.leaderClub
                       : "System Admin"}
+                  </td>
+                  <td className="py-3">
+                    {type === "admin" ? (
+                      <span className="text-slate-500 font-semibold">
+                        Protected
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => deleteUser(item._id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

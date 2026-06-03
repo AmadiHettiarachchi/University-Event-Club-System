@@ -46,3 +46,53 @@ export const getAllEvents = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.role === "admin") {
+      return res.status(400).json({
+        message: "Admin account cannot be deleted",
+      });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const deleteEvent = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        message: "Event not found",
+      });
+    }
+
+    await Event.findByIdAndDelete(req.params.id);
+
+    res.json({
+      message: "Event deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
