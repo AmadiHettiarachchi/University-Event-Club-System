@@ -9,6 +9,18 @@ import {
   MessageSquare,
   Megaphone,
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
 function AdminDashboard() {
   const [stats, setStats] = useState({});
@@ -33,6 +45,31 @@ function AdminDashboard() {
   const students = users.filter((item) => item.role === "student");
   const clubLeaders = users.filter((item) => item.role === "clubLeader");
   const admins = users.filter((item) => item.role === "admin");
+
+  const usersByRoleData = [
+    { name: "Students", value: students.length },
+    { name: "Club Leaders", value: clubLeaders.length },
+    { name: "Admin", value: admins.length },
+  ];
+
+  const systemActivityData = [
+    { name: "Events", count: stats.totalEvents || 0 },
+    { name: "Registrations", count: stats.totalRegistrations || 0 },
+    { name: "Attendance", count: stats.totalAttendance || 0 },
+    { name: "Feedback", count: stats.totalFeedback || 0 },
+    { name: "Announcements", count: stats.totalAnnouncements || 0 },
+  ];
+
+  const eventsByClubData = Object.values(
+    events.reduce((acc, event) => {
+      if (!acc[event.club]) {
+        acc[event.club] = { club: event.club, count: 0 };
+      }
+
+      acc[event.club].count += 1;
+      return acc;
+    }, {})
+  );
 
   const deleteUser = async (userId) => {
     const confirmDelete = window.confirm(
@@ -85,7 +122,7 @@ function AdminDashboard() {
 
             <p className="text-slate-600 mt-3">
               Monitor university clubs, events, students, attendance, feedback,
-              and announcements.
+              announcements, and system performance.
             </p>
           </div>
 
@@ -105,6 +142,58 @@ function AdminDashboard() {
           <StatCard icon={<CheckCircle />} title="Attendance" value={stats.totalAttendance} />
           <StatCard icon={<MessageSquare />} title="Feedback" value={stats.totalFeedback} />
           <StatCard icon={<Megaphone />} title="Announcements" value={stats.totalAnnouncements} />
+        </div>
+
+        <h2 className="text-2xl font-extrabold text-blue-950 mt-12 mb-5">
+          Analytics Overview
+        </h2>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          <ChartCard title="Users by Role">
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie
+                  data={usersByRoleData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={90}
+                  label
+                >
+                  {usersByRoleData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={index === 0 ? "#1E3A8A" : index === 1 ? "#F97316" : "#16A34A"}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="System Activity">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={systemActivityData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#F97316" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Events by Club">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={eventsByClubData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="club" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#1E3A8A" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </div>
 
         <UserSection
@@ -172,6 +261,15 @@ function AdminDashboard() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function ChartCard({ title, children }) {
+  return (
+    <div className="bg-blue-50 rounded-3xl p-6 border border-blue-100 shadow-sm">
+      <h3 className="text-xl font-extrabold text-blue-950 mb-4">{title}</h3>
+      {children}
     </div>
   );
 }
