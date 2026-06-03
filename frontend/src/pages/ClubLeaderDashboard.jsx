@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Megaphone } from "lucide-react";
+import AutoEventPoster from "../components/AutoEventPoster";
 
 function ClubLeaderDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -175,8 +176,13 @@ function ClubLeaderDashboard() {
                   key={event._id}
                   className="bg-blue-50 rounded-2xl p-6 border border-blue-100"
                 >
+                  <AutoEventPoster event={event} />
                   <div className="flex justify-between items-start gap-5">
                     <div>
+                      <p className="text-orange-500 font-bold mb-2">
+                        {event.club}
+                      </p>
+
                       <h3 className="text-2xl font-extrabold text-blue-950 mb-2">
                         {event.title}
                       </h3>

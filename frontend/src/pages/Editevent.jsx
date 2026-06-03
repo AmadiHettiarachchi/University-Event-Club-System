@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { Pencil } from "lucide-react";
+import { Pencil, ArrowLeft } from "lucide-react";
 
 function EditEvent() {
   const navigate = useNavigate();
@@ -39,15 +39,15 @@ function EditEvent() {
 
     try {
       const res = await axios.put(
-       `http://localhost:5000/api/events/${event._id}`,
+        `http://localhost:5000/api/events/${event._id}`,
         formData
-    );
+      );
 
-    setMessage("Event updated successfully!");
+      setMessage("Event updated successfully!");
 
-    setTimeout(() => {
-      navigate("/event-post", { state: { event: res.data.event } });
-    }, 1000);
+      setTimeout(() => {
+        navigate("/event-post", { state: { event: res.data.event } });
+      }, 1000);
     } catch (error) {
       setMessage(error.response?.data?.message || "Event update failed");
     }
@@ -56,6 +56,14 @@ function EditEvent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center px-6 py-10">
       <div className="bg-white shadow-2xl rounded-3xl w-full max-w-2xl p-8 border border-blue-100">
+        <Link
+          to="/club-leader-dashboard"
+          className="inline-flex items-center gap-2 text-blue-900 font-bold mb-6"
+        >
+          <ArrowLeft size={20} />
+          Back to Dashboard
+        </Link>
+
         <div className="flex justify-center mb-4">
           <div className="bg-orange-100 text-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center">
             <Pencil size={34} />

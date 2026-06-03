@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import AutoEventPoster from "../components/AutoEventPoster";
 import {
   Users,
   UserCheck,
@@ -230,6 +231,8 @@ function AdminDashboard() {
                 key={event._id}
                 className="bg-orange-50 rounded-2xl p-6 border border-orange-100"
               >
+                <AutoEventPoster event={event} />
+                
                 <p className="text-orange-500 font-bold mb-2">{event.club}</p>
 
                 <h3 className="text-xl font-extrabold text-blue-950 mb-2">

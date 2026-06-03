@@ -4,6 +4,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import { Megaphone } from "lucide-react";
+import AutoEventPoster from "../components/AutoEventPoster";
 
 function StudentDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -179,10 +180,13 @@ function StudentDashboard() {
 
       generateCertificate(event);
 
-      await axios.put("http://localhost:5000/api/attendance/certificate-download", {
-        eventId: event._id,
-        studentId: user.id,
-      });
+      await axios.put(
+        "http://localhost:5000/api/attendance/certificate-download",
+        {
+          eventId: event._id,
+          studentId: user.id,
+        }
+      );
 
       setMessage("Certificate downloaded successfully");
       fetchData();
@@ -293,6 +297,8 @@ function StudentDashboard() {
                   key={event._id}
                   className="bg-blue-50 rounded-2xl p-6 border border-blue-100"
                 >
+                  <AutoEventPoster event={event} />
+                  
                   <p className="text-orange-500 font-bold mb-2">{event.club}</p>
 
                   <h3 className="text-xl font-extrabold text-blue-950 mb-2">
