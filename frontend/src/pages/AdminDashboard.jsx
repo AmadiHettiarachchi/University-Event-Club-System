@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AutoEventPoster from "../components/AutoEventPoster";
+import EventStatusBadge from "../components/EventStatusBadge";
 import {
   Users,
   UserCheck,
@@ -163,7 +164,13 @@ function AdminDashboard() {
                   {usersByRoleData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={index === 0 ? "#1E3A8A" : index === 1 ? "#F97316" : "#16A34A"}
+                      fill={
+                        index === 0
+                          ? "#1E3A8A"
+                          : index === 1
+                          ? "#F97316"
+                          : "#16A34A"
+                      }
                     />
                   ))}
                 </Pie>
@@ -232,7 +239,11 @@ function AdminDashboard() {
                 className="bg-orange-50 rounded-2xl p-6 border border-orange-100"
               >
                 <AutoEventPoster event={event} />
-                
+
+                <div className="mb-4">
+                  <EventStatusBadge date={event.date} />
+                </div>
+
                 <p className="text-orange-500 font-bold mb-2">{event.club}</p>
 
                 <h3 className="text-xl font-extrabold text-blue-950 mb-2">

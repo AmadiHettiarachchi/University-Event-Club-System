@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import { Megaphone } from "lucide-react";
 import AutoEventPoster from "../components/AutoEventPoster";
+import EventStatusBadge from "../components/EventStatusBadge";
 
 function StudentDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -299,6 +300,10 @@ function StudentDashboard() {
                 >
                   <AutoEventPoster event={event} />
                   
+                  <div className="mb-3">
+                    <EventStatusBadge date={event.date} />
+                  </div>
+
                   <p className="text-orange-500 font-bold mb-2">{event.club}</p>
 
                   <h3 className="text-xl font-extrabold text-blue-950 mb-2">
