@@ -16,6 +16,7 @@ function EditEvent() {
     description: event?.description || "",
     venue: event?.venue || "",
     date: event?.date ? event.date.split("T")[0] : "",
+    capacity: event?.capacity || "",
     club: event?.club || "",
     createdBy: event?.createdBy || "",
   });
@@ -51,10 +52,20 @@ function EditEvent() {
       return;
     }
 
+    if (Number(formData.capacity) < 1) {
+      setMessage("Capacity must be at least 1");
+      return;
+    }
+
     try {
+      const eventData = {
+        ...formData,
+        capacity: Number(formData.capacity),
+      };
+
       const res = await axios.put(
         `http://localhost:5000/api/events/${event._id}`,
-        formData
+        eventData
       );
 
       setMessage("Event updated successfully!");
@@ -147,6 +158,17 @@ function EditEvent() {
             onChange={handleChange}
             required
             className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          />
+
+          <input
+            type="number"
+            name="capacity"
+            min="1"
+            placeholder="Maximum Participants / Capacity"
+            value={formData.capacity}
+            onChange={handleChange}
+            required
+            className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           <input

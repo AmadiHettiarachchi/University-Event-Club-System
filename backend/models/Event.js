@@ -32,9 +32,15 @@ const eventSchema = mongoose.Schema(
       required: true,
     },
 
+    capacity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+
     poster: {
-       type: String,
-       default: "",
+      type: String,
+      default: "",
     },
   },
   {
