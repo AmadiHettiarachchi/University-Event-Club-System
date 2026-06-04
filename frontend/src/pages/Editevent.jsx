@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Pencil, ArrowLeft } from "lucide-react";
+import campusBg from "../assets/campus-bg.jpg";
 
 function EditEvent() {
   const navigate = useNavigate();
@@ -22,7 +23,20 @@ function EditEvent() {
   const [message, setMessage] = useState("");
 
   if (!event) {
-    return <p className="p-10">No event selected.</p>;
+    return (
+      <div className="min-h-screen relative flex items-center justify-center px-6 py-10 overflow-hidden">
+        <div
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${campusBg})` }}
+        ></div>
+
+        <div className="fixed inset-0 bg-blue-950/20"></div>
+
+        <div className="relative z-10 bg-white/40 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/50">
+          <p className="text-blue-950 font-bold">No event selected.</p>
+        </div>
+      </div>
+    );
   }
 
   const handleChange = (e) => {
@@ -54,18 +68,25 @@ function EditEvent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center px-6 py-10">
-      <div className="bg-white shadow-2xl rounded-3xl w-full max-w-2xl p-8 border border-blue-100">
+    <div className="min-h-screen relative flex items-center justify-center px-6 py-10 overflow-hidden">
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${campusBg})` }}
+      ></div>
+
+      <div className="fixed inset-0 bg-blue-950/20"></div>
+
+      <div className="relative z-10 bg-white/40 backdrop-blur-sm shadow-2xl rounded-3xl w-full max-w-2xl p-8 border border-white/50">
         <Link
           to="/club-leader-dashboard"
-          className="inline-flex items-center gap-2 text-blue-900 font-bold mb-6"
+          className="inline-flex items-center gap-2 text-blue-950 font-bold mb-6 hover:text-orange-500"
         >
           <ArrowLeft size={20} />
           Back to Dashboard
         </Link>
 
         <div className="flex justify-center mb-4">
-          <div className="bg-orange-100 text-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center">
+          <div className="bg-orange-100/80 text-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center border border-orange-200">
             <Pencil size={34} />
           </div>
         </div>
@@ -74,13 +95,15 @@ function EditEvent() {
           Edit Event
         </h1>
 
-        <p className="text-center text-slate-600 mb-6">
+        <p className="text-center text-blue-900 mb-6">
           Updating event for{" "}
-          <span className="font-bold text-orange-500">{formData.club}</span>
+          <span className="font-bold text-orange-500">
+            {formData.club || "No club selected"}
+          </span>
         </p>
 
         {message && (
-          <p className="text-center mb-4 font-semibold text-orange-600">
+          <p className="text-center mb-4 font-semibold text-orange-700 bg-orange-100/75 p-3 rounded-xl border border-orange-300">
             {message}
           </p>
         )}
@@ -93,7 +116,7 @@ function EditEvent() {
             value={formData.title}
             onChange={handleChange}
             required
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           <textarea
@@ -103,7 +126,7 @@ function EditEvent() {
             onChange={handleChange}
             required
             rows="4"
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           ></textarea>
 
           <input
@@ -113,7 +136,7 @@ function EditEvent() {
             value={formData.venue}
             onChange={handleChange}
             required
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           <input
@@ -123,14 +146,14 @@ function EditEvent() {
             value={formData.date}
             onChange={handleChange}
             required
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           <input
             type="text"
             value={formData.club}
             disabled
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl bg-blue-50 text-blue-950 font-bold"
+            className="w-full bg-sky-100/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 font-bold"
           />
 
           <button

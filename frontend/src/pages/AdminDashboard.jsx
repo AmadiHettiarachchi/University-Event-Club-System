@@ -4,6 +4,7 @@ import AutoEventPoster from "../components/AutoEventPoster";
 import EventStatusBadge from "../components/EventStatusBadge";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import campusBg from "../assets/campus-bg.jpg";
 import {
   Users,
   UserCheck,
@@ -211,8 +212,13 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 p-10">
-      <div className="bg-white shadow-xl rounded-3xl p-8 border border-blue-100">
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed p-10 relative"
+      style={{ backgroundImage: `url(${campusBg})` }}
+    >
+      <div className="absolute inset-0 bg-sky-100/35"></div>
+
+      <div className="relative z-10 bg-sky-50/70 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/60">
         <div className="flex justify-between items-start mb-10">
           <div>
             <p className="text-orange-500 font-bold mb-2">Admin Dashboard</p>
@@ -221,7 +227,7 @@ function AdminDashboard() {
               Welcome, {user?.name}
             </h1>
 
-            <p className="text-slate-600 mt-3">
+            <p className="text-blue-900 mt-3">
               Monitor university clubs, events, students, attendance, feedback,
               announcements, and system performance.
             </p>
@@ -229,7 +235,7 @@ function AdminDashboard() {
 
           <button
             onClick={handleLogout}
-            className="bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
+            className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
           >
             Logout
           </button>
@@ -330,12 +336,12 @@ function AdminDashboard() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {events.length === 0 ? (
-            <p className="text-slate-600">No events found.</p>
+            <p className="text-blue-900">No events found.</p>
           ) : (
             events.map((event) => (
               <div
                 key={event._id}
-                className="bg-orange-50 rounded-2xl p-6 border border-orange-100"
+                className="bg-sky-50/65 backdrop-blur-sm rounded-2xl p-6 border border-white/70 shadow-lg"
               >
                 <AutoEventPoster event={event} />
 
@@ -349,17 +355,17 @@ function AdminDashboard() {
                   {event.title}
                 </h3>
 
-                <p className="text-slate-600 mb-3">{event.description}</p>
+                <p className="text-blue-900 mb-3">{event.description}</p>
 
-                <p className="text-sm text-slate-700">
+                <p className="text-sm text-blue-900">
                   📍 <span className="font-bold">{event.venue}</span>
                 </p>
 
-                <p className="text-sm text-slate-700">
+                <p className="text-sm text-blue-900">
                   📅 {new Date(event.date).toDateString()}
                 </p>
 
-                <p className="text-xs text-slate-500 mt-3">
+                <p className="text-xs text-slate-600 mt-3">
                   Created by: {event.createdBy}
                 </p>
 
@@ -390,7 +396,7 @@ function AdminDashboard() {
 
 function ChartCard({ title, children }) {
   return (
-    <div className="bg-blue-50 rounded-3xl p-6 border border-blue-100 shadow-sm">
+    <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-white/70 shadow-sm">
       <h3 className="text-xl font-extrabold text-blue-950 mb-4">{title}</h3>
       {children}
     </div>
@@ -402,13 +408,13 @@ function UserSection({ title, users, type, deleteUser }) {
     <div className="mt-12">
       <h2 className="text-2xl font-extrabold text-blue-950 mb-5">{title}</h2>
 
-      <div className="overflow-x-auto bg-blue-50 rounded-2xl p-5 border border-blue-100">
+      <div className="overflow-x-auto bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-white/70">
         {users.length === 0 ? (
-          <p className="text-slate-600">No users found.</p>
+          <p className="text-blue-900">No users found.</p>
         ) : (
           <table className="w-full text-left">
             <thead>
-              <tr className="text-blue-950 border-b">
+              <tr className="text-blue-950 border-b border-blue-200">
                 <th className="py-3">Name</th>
                 <th className="py-3">Email</th>
                 <th className="py-3">
@@ -424,7 +430,7 @@ function UserSection({ title, users, type, deleteUser }) {
 
             <tbody>
               {users.map((item) => (
-                <tr key={item._id} className="border-b text-slate-700">
+                <tr key={item._id} className="border-b border-blue-100 text-blue-900">
                   <td className="py-3 font-semibold">{item.name}</td>
                   <td className="py-3">{item.email}</td>
                   <td className="py-3">
@@ -460,12 +466,12 @@ function UserSection({ title, users, type, deleteUser }) {
 
 function StatCard({ icon, title, value }) {
   return (
-    <div className="bg-blue-50 rounded-3xl p-6 border border-blue-100 hover:-translate-y-1 transition">
-      <div className="bg-orange-100 text-orange-500 w-14 h-14 rounded-2xl flex items-center justify-center mb-4">
+    <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-white/70 hover:-translate-y-1 transition shadow-sm">
+      <div className="bg-orange-100/90 text-orange-500 w-14 h-14 rounded-2xl flex items-center justify-center mb-4">
         {icon}
       </div>
 
-      <h3 className="text-slate-600 font-semibold">{title}</h3>
+      <h3 className="text-blue-900 font-semibold">{title}</h3>
 
       <p className="text-4xl font-extrabold text-blue-950 mt-2">
         {value ?? 0}

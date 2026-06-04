@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { ArrowLeft, CheckCircle } from "lucide-react";
+import campusBg from "../assets/campus-bg.jpg";
 
 function MarkAttendance() {
   const scannerRef = useRef(null);
@@ -71,11 +72,16 @@ function MarkAttendance() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 p-10">
-      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-8 border border-blue-100">
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed p-10 relative"
+      style={{ backgroundImage: `url(${campusBg})` }}
+    >
+      <div className="absolute inset-0 bg-sky-100/35"></div>
+
+      <div className="relative z-10 max-w-3xl mx-auto bg-sky-50/70 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/60">
         <Link
           to="/club-leader-dashboard"
-          className="inline-flex items-center gap-2 text-blue-900 font-bold mb-6"
+          className="inline-flex items-center gap-2 text-blue-950 font-bold mb-6 hover:text-orange-500"
         >
           <ArrowLeft size={20} />
           Back to Dashboard
@@ -85,32 +91,36 @@ function MarkAttendance() {
           QR Attendance Scanner
         </h1>
 
-        <p className="text-slate-600 mb-6">
+        <p className="text-blue-900 mb-6">
           Scan a registered student's QR code. Each QR can be used only one time.
         </p>
 
         {message && (
-          <div className="mb-5 bg-orange-100 text-orange-600 p-3 rounded-xl font-bold">
+          <div className="mb-5 bg-orange-100/80 text-orange-700 p-3 rounded-xl font-bold border border-orange-300">
             {message}
           </div>
         )}
 
         {!scannerStopped && (
-          <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
-            <div id="reader"></div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-white/70 shadow-sm">
+            <div
+              id="reader"
+              className="overflow-hidden rounded-xl text-blue-950"
+            ></div>
           </div>
         )}
 
         {attendanceDetails && (
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-2xl p-6">
+          <div className="mt-6 bg-green-50/80 backdrop-blur-sm border border-green-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <CheckCircle className="text-green-600" size={28} />
+
               <h2 className="text-2xl font-extrabold text-green-700">
                 Attendance Marked
               </h2>
             </div>
 
-            <div className="space-y-2 text-slate-700">
+            <div className="space-y-2 text-blue-900">
               <p>
                 <span className="font-bold">Student Name:</span>{" "}
                 {attendanceDetails.studentName}
@@ -137,7 +147,7 @@ function MarkAttendance() {
               </p>
             </div>
 
-            <div className="flex gap-4 mt-6">
+            <div className="flex flex-wrap gap-4 mt-6">
               <button
                 onClick={restartScanner}
                 className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600"

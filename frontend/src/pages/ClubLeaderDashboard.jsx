@@ -6,6 +6,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import AutoEventPoster from "../components/AutoEventPoster";
 import EventStatusBadge from "../components/EventStatusBadge";
+import campusBg from "../assets/campus-bg.jpg";
 
 function ClubLeaderDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -138,8 +139,13 @@ function ClubLeaderDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 p-10">
-      <div className="bg-white shadow-xl rounded-3xl p-8 border border-blue-100">
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed p-10 relative"
+      style={{ backgroundImage: `url(${campusBg})` }}
+    >
+      <div className="absolute inset-0 bg-sky-100/35"></div>
+
+      <div className="relative z-10 bg-sky-50/70 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-white/60">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-orange-500 font-bold mb-2">
@@ -150,7 +156,7 @@ function ClubLeaderDashboard() {
               {user?.leaderClub} Dashboard
             </h1>
 
-            <p className="text-slate-600 mt-3">
+            <p className="text-blue-900 mt-3">
               Welcome, <span className="font-bold">{user?.name}</span>. You are
               managing{" "}
               <span className="font-bold text-orange-500">
@@ -162,7 +168,7 @@ function ClubLeaderDashboard() {
 
           <button
             onClick={handleLogout}
-            className="bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
+            className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
           >
             Logout
           </button>
@@ -185,16 +191,16 @@ function ClubLeaderDashboard() {
 
           <Link
             to="/create-announcement"
-            className="bg-orange-100 text-orange-600 px-6 py-3 rounded-xl font-bold hover:bg-orange-200"
+            className="bg-orange-100/80 text-orange-600 px-6 py-3 rounded-xl font-bold hover:bg-orange-200 border border-orange-300"
           >
             Create Announcement
           </Link>
         </div>
 
-        <div className="mt-10 rounded-3xl bg-gradient-to-r from-orange-500 to-blue-900 p-1 shadow-xl">
-          <div className="bg-white rounded-3xl p-6">
+        <div className="mt-10 rounded-3xl bg-gradient-to-r from-orange-400/80 to-blue-500/80 p-1 shadow-xl">
+          <div className="bg-sky-50/75 backdrop-blur-sm rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-5">
-              <div className="bg-orange-100 text-orange-500 w-12 h-12 rounded-2xl flex items-center justify-center">
+              <div className="bg-orange-100/90 text-orange-500 w-12 h-12 rounded-2xl flex items-center justify-center">
                 <Megaphone size={26} />
               </div>
 
@@ -207,19 +213,21 @@ function ClubLeaderDashboard() {
             </div>
 
             {announcements.length === 0 ? (
-              <p className="text-slate-600">No announcements created yet.</p>
+              <p className="text-blue-900">No announcements created yet.</p>
             ) : (
               <div className="grid md:grid-cols-3 gap-6">
                 {announcements.map((item) => (
                   <div
                     key={item._id}
-                    className="bg-orange-50 rounded-2xl p-5 border-l-4 border-orange-500 shadow-sm"
+                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 border-l-4 border-orange-400 shadow-sm"
                   >
                     <h3 className="text-xl font-extrabold text-blue-950 mb-2">
                       {item.title}
                     </h3>
-                    <p className="text-slate-600">{item.message}</p>
-                    <p className="text-xs text-slate-500 mt-3">
+
+                    <p className="text-blue-900">{item.message}</p>
+
+                    <p className="text-xs text-slate-600 mt-3">
                       {new Date(item.createdAt).toDateString()}
                     </p>
                   </div>
@@ -234,7 +242,7 @@ function ClubLeaderDashboard() {
         </h2>
 
         {events.length === 0 ? (
-          <p className="text-slate-600">No events created yet.</p>
+          <p className="text-blue-900">No events created yet.</p>
         ) : (
           <div className="space-y-6">
             {events.map((event) => {
@@ -246,7 +254,7 @@ function ClubLeaderDashboard() {
               return (
                 <div
                   key={event._id}
-                  className="bg-blue-50 rounded-2xl p-6 border border-blue-100"
+                  className="bg-sky-50/65 backdrop-blur-sm rounded-2xl p-6 border border-white/70 shadow-lg"
                 >
                   <AutoEventPoster event={event} />
 
@@ -254,7 +262,7 @@ function ClubLeaderDashboard() {
                     <EventStatusBadge date={event.date} />
                   </div>
 
-                  <div className="flex justify-between items-start gap-5">
+                  <div className="flex flex-col lg:flex-row justify-between items-start gap-5">
                     <div>
                       <p className="text-orange-500 font-bold mb-2">
                         {event.club}
@@ -264,17 +272,19 @@ function ClubLeaderDashboard() {
                         {event.title}
                       </h3>
 
-                      <p className="text-slate-600 mb-3">{event.description}</p>
+                      <p className="text-blue-900 mb-3">
+                        {event.description}
+                      </p>
 
-                      <p className="text-sm text-slate-700">
+                      <p className="text-sm text-blue-900">
                         📍 <span className="font-bold">{event.venue}</span>
                       </p>
 
-                      <p className="text-sm text-slate-700">
+                      <p className="text-sm text-blue-900">
                         📅 {new Date(event.date).toDateString()}
                       </p>
 
-                      <p className="text-sm text-slate-700 mt-2">
+                      <p className="text-sm text-blue-900 mt-2">
                         ⭐ Average Rating:{" "}
                         <span className="font-bold text-orange-500">
                           {avgRating}/5
@@ -282,7 +292,7 @@ function ClubLeaderDashboard() {
                       </p>
                     </div>
 
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3 w-full lg:w-auto">
                       <Link
                         to={`/edit-event/${event._id}`}
                         state={{ event }}
@@ -307,7 +317,7 @@ function ClubLeaderDashboard() {
                       color="orange"
                     >
                       {students.length === 0 ? (
-                        <p className="text-slate-600">
+                        <p className="text-blue-900">
                           No students registered yet.
                         </p>
                       ) : (
@@ -326,7 +336,7 @@ function ClubLeaderDashboard() {
                       color="green"
                     >
                       {presentStudents.length === 0 ? (
-                        <p className="text-slate-600">
+                        <p className="text-blue-900">
                           No attendance marked yet.
                         </p>
                       ) : (
@@ -345,17 +355,22 @@ function ClubLeaderDashboard() {
                       color="blue"
                     >
                       {eventFeedback.length === 0 ? (
-                        <p className="text-slate-600">No feedback yet.</p>
+                        <p className="text-blue-900">No feedback yet.</p>
                       ) : (
                         eventFeedback.map((item) => (
-                          <div key={item._id} className="border-b py-3">
+                          <div
+                            key={item._id}
+                            className="border-b border-blue-100 py-3"
+                          >
                             <p className="font-bold text-blue-950">
                               {item.studentName}
                             </p>
+
                             <p className="text-sm text-orange-500 font-bold">
                               Rating: {item.rating}/5
                             </p>
-                            <p className="text-sm text-slate-600 mt-1">
+
+                            <p className="text-sm text-blue-900 mt-1">
                               {item.comment}
                             </p>
                           </div>
@@ -382,7 +397,7 @@ function Section({ title, color, children }) {
       : "text-blue-900";
 
   return (
-    <div className="bg-white rounded-2xl p-5 border border-blue-100">
+    <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-white/70 shadow-sm">
       <h4 className={`text-lg font-extrabold mb-4 ${colorClass}`}>{title}</h4>
       <div className="space-y-3">{children}</div>
     </div>
@@ -391,9 +406,9 @@ function Section({ title, color, children }) {
 
 function Person({ name, email }) {
   return (
-    <div className="border-b pb-2">
+    <div className="border-b border-blue-100 pb-2">
       <p className="font-semibold text-blue-950">{name}</p>
-      <p className="text-sm text-slate-600">{email}</p>
+      <p className="text-sm text-blue-900">{email}</p>
     </div>
   );
 }

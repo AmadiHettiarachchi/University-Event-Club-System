@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { CalendarPlus, ArrowLeft } from "lucide-react";
+import campusBg from "../assets/campus-bg.jpg";
 
 function CreateEvent() {
   const navigate = useNavigate();
@@ -51,18 +52,23 @@ function CreateEvent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center px-6 py-10">
-      <div className="bg-white shadow-2xl rounded-3xl w-full max-w-2xl p-8 border border-blue-100">
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed flex items-center justify-center px-6 py-10 relative"
+      style={{ backgroundImage: `url(${campusBg})` }}
+    >
+      <div className="absolute inset-0 bg-sky-100/35"></div>
+
+      <div className="relative z-10 bg-sky-50/70 backdrop-blur-sm shadow-2xl rounded-3xl w-full max-w-2xl p-8 border border-white/60">
         <Link
           to="/club-leader-dashboard"
-          className="inline-flex items-center gap-2 text-blue-900 font-bold mb-6"
+          className="inline-flex items-center gap-2 text-blue-950 font-bold mb-6 hover:text-orange-500"
         >
           <ArrowLeft size={20} />
           Back to Dashboard
         </Link>
 
         <div className="flex justify-center mb-4">
-          <div className="bg-orange-100 text-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center">
+          <div className="bg-orange-100/90 text-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center border border-orange-200">
             <CalendarPlus size={34} />
           </div>
         </div>
@@ -71,7 +77,7 @@ function CreateEvent() {
           Create New Event
         </h1>
 
-        <p className="text-center text-slate-600 mb-6">
+        <p className="text-center text-blue-900 mb-6">
           Creating event for{" "}
           <span className="font-bold text-orange-500">
             {formData.club || "No club selected"}
@@ -79,7 +85,7 @@ function CreateEvent() {
         </p>
 
         {message && (
-          <p className="text-center mb-4 font-semibold text-orange-600">
+          <p className="text-center mb-4 font-semibold text-orange-700 bg-orange-100/80 p-3 rounded-xl border border-orange-300">
             {message}
           </p>
         )}
@@ -92,7 +98,7 @@ function CreateEvent() {
             value={formData.title}
             onChange={handleChange}
             required
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 backdrop-blur-sm border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           <textarea
@@ -102,7 +108,7 @@ function CreateEvent() {
             onChange={handleChange}
             required
             rows="4"
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 backdrop-blur-sm border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           ></textarea>
 
           <input
@@ -112,7 +118,7 @@ function CreateEvent() {
             value={formData.venue}
             onChange={handleChange}
             required
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 backdrop-blur-sm border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           <input
@@ -122,14 +128,14 @@ function CreateEvent() {
             value={formData.date}
             onChange={handleChange}
             required
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full bg-white/70 backdrop-blur-sm border border-white/70 px-4 py-3 rounded-xl text-blue-950 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           <input
             type="text"
             value={formData.club || "Club name missing"}
             disabled
-            className="w-full border border-blue-100 px-4 py-3 rounded-xl bg-blue-50 text-blue-950 font-bold"
+            className="w-full bg-sky-100/80 border border-white/70 px-4 py-3 rounded-xl text-blue-950 font-bold"
           />
 
           <button
