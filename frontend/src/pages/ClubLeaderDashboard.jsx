@@ -63,6 +63,24 @@ function ClubLeaderDashboard() {
     return (total / eventFeedback.length).toFixed(1);
   };
 
+  const getRemainingSeats = (event) => {
+    const capacity = Number(event.capacity || 0);
+    const registeredCount = getRegisteredStudents(event._id).length;
+
+    if (!capacity) return "Not set";
+
+    return Math.max(capacity - registeredCount, 0);
+  };
+
+  const isEventFull = (event) => {
+    const capacity = Number(event.capacity || 0);
+    const registeredCount = getRegisteredStudents(event._id).length;
+
+    if (!capacity) return false;
+
+    return registeredCount >= capacity;
+  };
+
   const downloadAttendanceReport = (event) => {
     const registeredStudents = getRegisteredStudents(event._id);
     const presentStudents = getPresentStudents(event._id);
@@ -90,12 +108,13 @@ function ClubLeaderDashboard() {
     doc.text(`Club: ${event.club}`, 14, 43);
     doc.text(`Venue: ${event.venue}`, 14, 51);
     doc.text(`Date: ${new Date(event.date).toDateString()}`, 14, 59);
+    doc.text(`Capacity: ${event.capacity || "Not set"}`, 14, 67);
 
     doc.setFont("helvetica", "bold");
-    doc.text(`Total Registered: ${totalRegistered}`, 14, 75);
-    doc.text(`Total Present: ${totalPresent}`, 14, 83);
-    doc.text(`Total Absent: ${totalAbsent}`, 14, 91);
-    doc.text(`Attendance Percentage: ${attendancePercentage}`, 14, 99);
+    doc.text(`Total Registered: ${totalRegistered}`, 14, 83);
+    doc.text(`Total Present: ${totalPresent}`, 14, 91);
+    doc.text(`Total Absent: ${totalAbsent}`, 14, 99);
+    doc.text(`Attendance Percentage: ${attendancePercentage}`, 14, 107);
 
     const tableData = registeredStudents.map((student, index) => {
       const isPresent = presentStudents.some(
@@ -113,7 +132,7 @@ function ClubLeaderDashboard() {
     });
 
     autoTable(doc, {
-      startY: 110,
+      startY: 118,
       head: [["No", "Student Name", "Email", "Status"]],
       body: tableData,
       theme: "grid",
@@ -166,19 +185,21 @@ function ClubLeaderDashboard() {
             </p>
           </div>
 
-           <Link
+          <div className="flex gap-3">
+            <Link
               to="/profile"
-              className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
-          >
+              className="bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
+            >
               My Profile
-           </Link>
+            </Link>
 
-          <button
-            onClick={handleLogout}
-            className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
-          >
-            Logout
-          </button>
+            <button
+              onClick={handleLogout}
+              className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="mt-6 flex flex-wrap gap-4">
@@ -257,6 +278,8 @@ function ClubLeaderDashboard() {
               const presentStudents = getPresentStudents(event._id);
               const eventFeedback = getEventFeedback(event._id);
               const avgRating = getAverageRating(eventFeedback);
+              const remainingSeats = getRemainingSeats(event);
+              const full = isEventFull(event);
 
               return (
                 <div
@@ -291,7 +314,32 @@ function ClubLeaderDashboard() {
                         📅 {new Date(event.date).toDateString()}
                       </p>
 
-                      <p className="text-sm text-blue-900 mt-2">
+                      <div className="mt-4 bg-white/70 rounded-2xl p-4 border border-white/80">
+                        <p className="text-sm text-blue-950 font-bold">
+                          Capacity: {event.capacity || "Not set"}
+                        </p>
+
+                        <p className="text-sm text-blue-950 font-bold">
+                          Registered: {students.length} /{" "}
+                          {event.capacity || "Not set"}
+                        </p>
+
+                        <p
+                          className={`text-sm font-bold ${
+                            full ? "text-red-500" : "text-green-600"
+                          }`}
+                        >
+                          Remaining Seats: {remainingSeats}
+                        </p>
+
+                        {full && (
+                          <p className="text-sm text-red-500 font-bold mt-1">
+                            Event Full
+                          </p>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-blue-900 mt-3">
                         ⭐ Average Rating:{" "}
                         <span className="font-bold text-orange-500">
                           {avgRating}/5
