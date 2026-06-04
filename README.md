@@ -15,6 +15,10 @@ A MERN stack web application for managing university clubs, events, student regi
 - Club announcements
 - Admin dashboard with users, events, and system statistics
 - 404 Not Found page
+- Auto-generated event posters
+- Event status badges
+- Attendance report PDF download
+- Admin analytics dashboard
 
 ## Technologies Used
 
