@@ -53,7 +53,22 @@ function StudentDashboard() {
     fetchData();
   }, []);
 
+  const isCompletedEvent = (date) => {
+    const today = new Date();
+    const eventDate = new Date(date);
+
+    today.setHours(0, 0, 0, 0);
+    eventDate.setHours(0, 0, 0, 0);
+
+    return eventDate < today;
+  };
+
   const handleRegisterEvent = async (event) => {
+    if (isCompletedEvent(event.date)) {
+      setMessage("You cannot register for a completed event");
+      return;
+    }
+
     try {
       const registrationData = {
         eventId: event._id,
@@ -292,6 +307,7 @@ function StudentDashboard() {
           <div className="grid md:grid-cols-3 gap-6">
             {events.map((event) => {
               const registration = getRegistration(event._id);
+              const completed = isCompletedEvent(event.date);
 
               return (
                 <div
@@ -299,8 +315,8 @@ function StudentDashboard() {
                   className="bg-blue-50 rounded-2xl p-6 border border-blue-100"
                 >
                   <AutoEventPoster event={event} />
-                  
-                  <div className="mb-3">
+
+                  <div className="mb-4">
                     <EventStatusBadge date={event.date} />
                   </div>
 
@@ -377,6 +393,13 @@ function StudentDashboard() {
                         </div>
                       )}
                     </div>
+                  ) : completed ? (
+                    <button
+                      disabled
+                      className="mt-4 bg-red-400 text-white px-5 py-2 rounded-xl font-bold cursor-not-allowed"
+                    >
+                      Registration Closed
+                    </button>
                   ) : (
                     <button
                       onClick={() => handleRegisterEvent(event)}

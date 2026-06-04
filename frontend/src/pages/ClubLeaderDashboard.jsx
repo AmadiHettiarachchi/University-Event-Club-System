@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Megaphone } from "lucide-react";
+import { Megaphone, FileDown } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import AutoEventPoster from "../components/AutoEventPoster";
 import EventStatusBadge from "../components/EventStatusBadge";
 
@@ -58,6 +60,75 @@ function ClubLeaderDashboard() {
     if (eventFeedback.length === 0) return "0.0";
     const total = eventFeedback.reduce((sum, item) => sum + item.rating, 0);
     return (total / eventFeedback.length).toFixed(1);
+  };
+
+  const downloadAttendanceReport = (event) => {
+    const registeredStudents = getRegisteredStudents(event._id);
+    const presentStudents = getPresentStudents(event._id);
+
+    const totalRegistered = registeredStudents.length;
+    const totalPresent = presentStudents.length;
+    const totalAbsent = totalRegistered - totalPresent;
+
+    const attendancePercentage =
+      totalRegistered === 0
+        ? "0%"
+        : `${((totalPresent / totalRegistered) * 100).toFixed(1)}%`;
+
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(30, 58, 138);
+    doc.text("Event Attendance Report", 105, 20, { align: "center" });
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+
+    doc.text(`Event: ${event.title}`, 14, 35);
+    doc.text(`Club: ${event.club}`, 14, 43);
+    doc.text(`Venue: ${event.venue}`, 14, 51);
+    doc.text(`Date: ${new Date(event.date).toDateString()}`, 14, 59);
+
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total Registered: ${totalRegistered}`, 14, 75);
+    doc.text(`Total Present: ${totalPresent}`, 14, 83);
+    doc.text(`Total Absent: ${totalAbsent}`, 14, 91);
+    doc.text(`Attendance Percentage: ${attendancePercentage}`, 14, 99);
+
+    const tableData = registeredStudents.map((student, index) => {
+      const isPresent = presentStudents.some(
+        (present) =>
+          present.studentId === student.studentId ||
+          present.studentEmail === student.studentEmail
+      );
+
+      return [
+        index + 1,
+        student.studentName,
+        student.studentEmail,
+        isPresent ? "Present" : "Absent",
+      ];
+    });
+
+    autoTable(doc, {
+      startY: 110,
+      head: [["No", "Student Name", "Email", "Status"]],
+      body: tableData,
+      theme: "grid",
+      headStyles: {
+        fillColor: [30, 58, 138],
+        textColor: [255, 255, 255],
+      },
+      alternateRowStyles: {
+        fillColor: [240, 248, 255],
+      },
+      styles: {
+        fontSize: 10,
+      },
+    });
+
+    doc.save(`${event.title}-attendance-report.pdf`);
   };
 
   const handleLogout = () => {
@@ -211,13 +282,23 @@ function ClubLeaderDashboard() {
                       </p>
                     </div>
 
-                    <Link
-                      to={`/edit-event/${event._id}`}
-                      state={{ event }}
-                      className="bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
-                    >
-                      Edit
-                    </Link>
+                    <div className="flex flex-col gap-3">
+                      <Link
+                        to={`/edit-event/${event._id}`}
+                        state={{ event }}
+                        className="bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800 text-center"
+                      >
+                        Edit
+                      </Link>
+
+                      <button
+                        onClick={() => downloadAttendanceReport(event)}
+                        className="flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+                      >
+                        <FileDown size={18} />
+                        Attendance Report
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-6 mt-6">

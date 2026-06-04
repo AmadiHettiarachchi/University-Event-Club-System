@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AutoEventPoster from "../components/AutoEventPoster";
 import EventStatusBadge from "../components/EventStatusBadge";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Users,
   UserCheck,
@@ -10,6 +12,7 @@ import {
   CheckCircle,
   MessageSquare,
   Megaphone,
+  FileDown,
 } from "lucide-react";
 import {
   BarChart,
@@ -28,6 +31,8 @@ function AdminDashboard() {
   const [stats, setStats] = useState({});
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const [attendance, setAttendance] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
 
   const fetchAdminData = async () => {
@@ -38,6 +43,25 @@ function AdminDashboard() {
     setStats(statsRes.data);
     setUsers(usersRes.data);
     setEvents(eventsRes.data);
+
+    let allRegistrations = [];
+    let allAttendance = [];
+
+    for (const event of eventsRes.data) {
+      const registrationRes = await axios.get(
+        `http://localhost:5000/api/event-registrations/club/${event.club}`
+      );
+
+      const attendanceRes = await axios.get(
+        `http://localhost:5000/api/attendance/club/${event.club}`
+      );
+
+      allRegistrations = [...allRegistrations, ...registrationRes.data];
+      allAttendance = [...allAttendance, ...attendanceRes.data];
+    }
+
+    setRegistrations(allRegistrations);
+    setAttendance(allAttendance);
   };
 
   useEffect(() => {
@@ -72,6 +96,81 @@ function AdminDashboard() {
       return acc;
     }, {})
   );
+
+  const getRegisteredStudents = (eventId) =>
+    registrations.filter((reg) => reg.eventId?._id === eventId);
+
+  const getPresentStudents = (eventId) =>
+    attendance.filter((item) => item.eventId?._id === eventId);
+
+  const downloadAttendanceReport = (event) => {
+    const registeredStudents = getRegisteredStudents(event._id);
+    const presentStudents = getPresentStudents(event._id);
+
+    const totalRegistered = registeredStudents.length;
+    const totalPresent = presentStudents.length;
+    const totalAbsent = totalRegistered - totalPresent;
+
+    const attendancePercentage =
+      totalRegistered === 0
+        ? "0%"
+        : `${((totalPresent / totalRegistered) * 100).toFixed(1)}%`;
+
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(30, 58, 138);
+    doc.text("Event Attendance Report", 105, 20, { align: "center" });
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+
+    doc.text(`Event: ${event.title}`, 14, 35);
+    doc.text(`Club: ${event.club}`, 14, 43);
+    doc.text(`Venue: ${event.venue}`, 14, 51);
+    doc.text(`Date: ${new Date(event.date).toDateString()}`, 14, 59);
+
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total Registered: ${totalRegistered}`, 14, 75);
+    doc.text(`Total Present: ${totalPresent}`, 14, 83);
+    doc.text(`Total Absent: ${totalAbsent}`, 14, 91);
+    doc.text(`Attendance Percentage: ${attendancePercentage}`, 14, 99);
+
+    const tableData = registeredStudents.map((student, index) => {
+      const isPresent = presentStudents.some(
+        (present) =>
+          present.studentId === student.studentId ||
+          present.studentEmail === student.studentEmail
+      );
+
+      return [
+        index + 1,
+        student.studentName,
+        student.studentEmail,
+        isPresent ? "Present" : "Absent",
+      ];
+    });
+
+    autoTable(doc, {
+      startY: 110,
+      head: [["No", "Student Name", "Email", "Status"]],
+      body: tableData,
+      theme: "grid",
+      headStyles: {
+        fillColor: [30, 58, 138],
+        textColor: [255, 255, 255],
+      },
+      alternateRowStyles: {
+        fillColor: [240, 248, 255],
+      },
+      styles: {
+        fontSize: 10,
+      },
+    });
+
+    doc.save(`${event.title}-attendance-report.pdf`);
+  };
 
   const deleteUser = async (userId) => {
     const confirmDelete = window.confirm(
@@ -264,12 +363,22 @@ function AdminDashboard() {
                   Created by: {event.createdBy}
                 </p>
 
-                <button
-                  onClick={() => deleteEvent(event._id)}
-                  className="mt-4 bg-red-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-red-600"
-                >
-                  Delete Event
-                </button>
+                <div className="mt-4 flex flex-col gap-3">
+                  <button
+                    onClick={() => downloadAttendanceReport(event)}
+                    className="flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+                  >
+                    <FileDown size={18} />
+                    Attendance Report
+                  </button>
+
+                  <button
+                    onClick={() => deleteEvent(event._id)}
+                    className="bg-red-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-red-600"
+                  >
+                    Delete Event
+                  </button>
+                </div>
               </div>
             ))
           )}
