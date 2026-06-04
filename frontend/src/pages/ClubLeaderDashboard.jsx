@@ -166,6 +166,13 @@ function ClubLeaderDashboard() {
             </p>
           </div>
 
+           <Link
+              to="/profile"
+              className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+          >
+              My Profile
+           </Link>
+
           <button
             onClick={handleLogout}
             className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"

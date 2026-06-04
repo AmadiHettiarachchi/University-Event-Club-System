@@ -14,6 +14,7 @@ import SubmitFeedback from "./pages/SubmitFeedback";
 import CreateAnnouncement from "./pages/CreateAnnouncement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -104,6 +105,7 @@ function App() {
       />
 
       <Route path="*" element={<NotFound />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
     
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import AutoEventPoster from "../components/AutoEventPoster";
 import EventStatusBadge from "../components/EventStatusBadge";
@@ -233,12 +234,21 @@ function AdminDashboard() {
             </p>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
-          >
-            Logout
-          </button>
+          <div className="flex gap-3">
+            <Link
+              to="/profile"
+              className="bg-blue-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-blue-800"
+            >
+              My Profile
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="bg-orange-500 text-white px-5 py-2 rounded-xl font-bold hover:bg-orange-600"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -259,23 +269,11 @@ function AdminDashboard() {
           <ChartCard title="Users by Role">
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
-                <Pie
-                  data={usersByRoleData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={90}
-                  label
-                >
+                <Pie data={usersByRoleData} dataKey="value" nameKey="name" outerRadius={90} label>
                   {usersByRoleData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={
-                        index === 0
-                          ? "#1E3A8A"
-                          : index === 1
-                          ? "#F97316"
-                          : "#16A34A"
-                      }
+                      fill={index === 0 ? "#1E3A8A" : index === 1 ? "#F97316" : "#16A34A"}
                     />
                   ))}
                 </Pie>
@@ -309,26 +307,9 @@ function AdminDashboard() {
           </ChartCard>
         </div>
 
-        <UserSection
-          title={`Students (${students.length})`}
-          users={students}
-          type="student"
-          deleteUser={deleteUser}
-        />
-
-        <UserSection
-          title={`Club Leaders (${clubLeaders.length})`}
-          users={clubLeaders}
-          type="leader"
-          deleteUser={deleteUser}
-        />
-
-        <UserSection
-          title={`Admin (${admins.length})`}
-          users={admins}
-          type="admin"
-          deleteUser={deleteUser}
-        />
+        <UserSection title={`Students (${students.length})`} users={students} type="student" deleteUser={deleteUser} />
+        <UserSection title={`Club Leaders (${clubLeaders.length})`} users={clubLeaders} type="leader" deleteUser={deleteUser} />
+        <UserSection title={`Admin (${admins.length})`} users={admins} type="admin" deleteUser={deleteUser} />
 
         <h2 className="text-2xl font-extrabold text-blue-950 mt-12 mb-5">
           All Events
@@ -418,11 +399,7 @@ function UserSection({ title, users, type, deleteUser }) {
                 <th className="py-3">Name</th>
                 <th className="py-3">Email</th>
                 <th className="py-3">
-                  {type === "student"
-                    ? "Joined Clubs"
-                    : type === "leader"
-                    ? "Managing Club"
-                    : "Role"}
+                  {type === "student" ? "Joined Clubs" : type === "leader" ? "Managing Club" : "Role"}
                 </th>
                 <th className="py-3">Actions</th>
               </tr>
@@ -434,17 +411,11 @@ function UserSection({ title, users, type, deleteUser }) {
                   <td className="py-3 font-semibold">{item.name}</td>
                   <td className="py-3">{item.email}</td>
                   <td className="py-3">
-                    {type === "student"
-                      ? item.clubs?.join(", ")
-                      : type === "leader"
-                      ? item.leaderClub
-                      : "System Admin"}
+                    {type === "student" ? item.clubs?.join(", ") : type === "leader" ? item.leaderClub : "System Admin"}
                   </td>
                   <td className="py-3">
                     {type === "admin" ? (
-                      <span className="text-slate-500 font-semibold">
-                        Protected
-                      </span>
+                      <span className="text-slate-500 font-semibold">Protected</span>
                     ) : (
                       <button
                         onClick={() => deleteUser(item._id)}
