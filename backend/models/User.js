@@ -24,18 +24,17 @@ const userSchema = mongoose.Schema(
       default: "student",
     },
 
-    // For students: they can join many clubs
     clubs: {
       type: [String],
       default: [],
     },
 
-    // For club leaders: they manage only one club
     leaderClub: {
       type: String,
       required: function () {
         return this.role === "clubLeader";
       },
+      default: "",
     },
   },
   {

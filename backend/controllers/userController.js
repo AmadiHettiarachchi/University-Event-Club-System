@@ -17,11 +17,15 @@ export const registerUser = async (req, res) => {
     }
 
     if (role === "student" && (!clubs || clubs.length === 0)) {
-      return res.status(400).json({ message: "Please select at least one club" });
+      return res.status(400).json({
+        message: "Please select at least one club",
+      });
     }
 
     if (role === "clubLeader" && !leaderClub) {
-      return res.status(400).json({ message: "Please select your club" });
+      return res.status(400).json({
+        message: "Please select your club",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -83,6 +87,68 @@ export const loginUser = async (req, res) => {
         role: user.role,
         clubs: user.clubs,
         leaderClub: user.leaderClub,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      clubs: user.clubs,
+      leaderClub: user.leaderClub,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const emailExists = await User.findOne({ email });
+
+    if (emailExists && emailExists._id.toString() !== req.params.id) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+
+    if (password && password.trim() !== "") {
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      message: "Profile updated successfully",
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        clubs: updatedUser.clubs,
+        leaderClub: updatedUser.leaderClub,
       },
     });
   } catch (error) {
