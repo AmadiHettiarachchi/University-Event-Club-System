@@ -16,6 +16,9 @@ function EditEvent() {
     description: event?.description || "",
     venue: event?.venue || "",
     date: event?.date ? event.date.split("T")[0] : "",
+    registrationDeadline: event?.registrationDeadline
+      ? event.registrationDeadline.split("T")[0]
+      : "",
     capacity: event?.capacity || "",
     club: event?.club || "",
     createdBy: event?.createdBy || "",
@@ -48,7 +51,17 @@ function EditEvent() {
     e.preventDefault();
 
     if (formData.date < today) {
-      setMessage("You cannot select a previous date");
+      setMessage("You cannot select a previous event date");
+      return;
+    }
+
+    if (formData.registrationDeadline < today) {
+      setMessage("Registration deadline cannot be a previous date");
+      return;
+    }
+
+    if (formData.registrationDeadline > formData.date) {
+      setMessage("Registration deadline cannot be after the event date");
       return;
     }
 
@@ -150,15 +163,36 @@ function EditEvent() {
             className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 placeholder:text-blue-800/60 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
-          <input
-            type="date"
-            name="date"
-            min={today}
-            value={formData.date}
-            onChange={handleChange}
-            required
-            className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 focus:outline-none focus:ring-2 focus:ring-orange-400"
-          />
+          <div>
+            <label className="block mb-2 font-bold text-blue-950">
+              Event Date
+            </label>
+            <input
+              type="date"
+              name="date"
+              min={today}
+              value={formData.date}
+              onChange={handleChange}
+              required
+              className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 font-bold text-blue-950">
+              Registration Deadline
+            </label>
+            <input
+              type="date"
+              name="registrationDeadline"
+              min={today}
+              max={formData.date || ""}
+              value={formData.registrationDeadline}
+              onChange={handleChange}
+              required
+              className="w-full bg-white/70 border border-white/70 px-4 py-3 rounded-xl text-blue-950 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+          </div>
 
           <input
             type="number"

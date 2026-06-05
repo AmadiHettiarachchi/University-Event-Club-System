@@ -2,35 +2,18 @@ import mongoose from "mongoose";
 
 const eventSchema = mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true,
-    },
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    venue: { type: String, required: true },
+    date: { type: Date, required: true },
 
-    description: {
-      type: String,
-      required: true,
-    },
-
-    venue: {
-      type: String,
-      required: true,
-    },
-
-    date: {
+    registrationDeadline: {
       type: Date,
       required: true,
     },
 
-    club: {
-      type: String,
-      required: true,
-    },
-
-    createdBy: {
-      type: String,
-      required: true,
-    },
+    club: { type: String, required: true },
+    createdBy: { type: String, required: true },
 
     capacity: {
       type: Number,
@@ -43,9 +26,7 @@ const eventSchema = mongoose.Schema(
       default: "",
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const Event = mongoose.model("Event", eventSchema);

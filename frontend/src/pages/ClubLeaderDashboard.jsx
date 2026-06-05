@@ -108,13 +108,22 @@ function ClubLeaderDashboard() {
     doc.text(`Club: ${event.club}`, 14, 43);
     doc.text(`Venue: ${event.venue}`, 14, 51);
     doc.text(`Date: ${new Date(event.date).toDateString()}`, 14, 59);
-    doc.text(`Capacity: ${event.capacity || "Not set"}`, 14, 67);
+    doc.text(
+      `Registration Deadline: ${
+        event.registrationDeadline
+          ? new Date(event.registrationDeadline).toDateString()
+          : "Not set"
+      }`,
+      14,
+      67
+    );
+    doc.text(`Capacity: ${event.capacity || "Not set"}`, 14, 75);
 
     doc.setFont("helvetica", "bold");
-    doc.text(`Total Registered: ${totalRegistered}`, 14, 83);
-    doc.text(`Total Present: ${totalPresent}`, 14, 91);
-    doc.text(`Total Absent: ${totalAbsent}`, 14, 99);
-    doc.text(`Attendance Percentage: ${attendancePercentage}`, 14, 107);
+    doc.text(`Total Registered: ${totalRegistered}`, 14, 91);
+    doc.text(`Total Present: ${totalPresent}`, 14, 99);
+    doc.text(`Total Absent: ${totalAbsent}`, 14, 107);
+    doc.text(`Attendance Percentage: ${attendancePercentage}`, 14, 115);
 
     const tableData = registeredStudents.map((student, index) => {
       const isPresent = presentStudents.some(
@@ -132,7 +141,7 @@ function ClubLeaderDashboard() {
     });
 
     autoTable(doc, {
-      startY: 118,
+      startY: 126,
       head: [["No", "Student Name", "Email", "Status"]],
       body: tableData,
       theme: "grid",
@@ -311,7 +320,14 @@ function ClubLeaderDashboard() {
                       </p>
 
                       <p className="text-sm text-blue-900">
-                        📅 {new Date(event.date).toDateString()}
+                        📅 Event Date: {new Date(event.date).toDateString()}
+                      </p>
+
+                      <p className="text-sm text-blue-900 font-bold">
+                        📝 Registration Deadline:{" "}
+                        {event.registrationDeadline
+                          ? new Date(event.registrationDeadline).toDateString()
+                          : "Not set"}
                       </p>
 
                       <div className="mt-4 bg-white/70 rounded-2xl p-4 border border-white/80">

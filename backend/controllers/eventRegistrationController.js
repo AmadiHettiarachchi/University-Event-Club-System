@@ -9,14 +9,22 @@ export const registerForEvent = async (req, res) => {
     const event = await Event.findById(eventId);
 
     if (!event) {
-      return res.status(404).json({
-        message: "Event not found",
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const deadline = new Date(event.registrationDeadline);
+    deadline.setHours(0, 0, 0, 0);
+
+    if (today > deadline) {
+      return res.status(400).json({
+        message: "Registration deadline has passed.",
       });
     }
 
-    const registeredCount = await EventRegistration.countDocuments({
-      eventId,
-    });
+    const registeredCount = await EventRegistration.countDocuments({ eventId });
 
     if (registeredCount >= event.capacity) {
       return res.status(400).json({
@@ -60,7 +68,7 @@ export const getRegistrationsByClub = async (req, res) => {
     const { club } = req.params;
 
     const registrations = await EventRegistration.find({ club })
-      .populate("eventId", "title date venue capacity")
+      .populate("eventId", "title date venue capacity registrationDeadline")
       .sort({ createdAt: -1 });
 
     res.json(registrations);

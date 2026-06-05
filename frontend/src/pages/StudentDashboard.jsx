@@ -73,6 +73,18 @@ function StudentDashboard() {
     return eventDate < today;
   };
 
+  const isRegistrationDeadlinePassed = (deadline) => {
+    if (!deadline) return false;
+
+    const today = new Date();
+    const deadlineDate = new Date(deadline);
+
+    today.setHours(0, 0, 0, 0);
+    deadlineDate.setHours(0, 0, 0, 0);
+
+    return today > deadlineDate;
+  };
+
   const getRegisteredCount = (eventId) => {
     return allClubRegistrations.filter((reg) => {
       const regEventId =
@@ -103,6 +115,11 @@ function StudentDashboard() {
   const handleRegisterEvent = async (event) => {
     if (isCompletedEvent(event.date)) {
       setMessage("You cannot register for a completed event");
+      return;
+    }
+
+    if (isRegistrationDeadlinePassed(event.registrationDeadline)) {
+      setMessage("Registration deadline has passed.");
       return;
     }
 
@@ -366,6 +383,9 @@ function StudentDashboard() {
               {events.map((event) => {
                 const registration = getRegistration(event._id);
                 const completed = isCompletedEvent(event.date);
+                const deadlinePassed = isRegistrationDeadlinePassed(
+                  event.registrationDeadline
+                );
                 const registeredCount = getRegisteredCount(event._id);
                 const remainingSeats = getRemainingSeats(event);
                 const full = isEventFull(event);
@@ -396,7 +416,18 @@ function StudentDashboard() {
                     </p>
 
                     <p className="text-sm text-slate-700">
-                      📅 {new Date(event.date).toDateString()}
+                      📅 Event Date: {new Date(event.date).toDateString()}
+                    </p>
+
+                    <p
+                      className={`text-sm font-bold ${
+                        deadlinePassed ? "text-red-500" : "text-blue-900"
+                      }`}
+                    >
+                      📝 Registration Deadline:{" "}
+                      {event.registrationDeadline
+                        ? new Date(event.registrationDeadline).toDateString()
+                        : "Not set"}
                     </p>
 
                     <div className="mt-4 bg-white rounded-2xl p-4 border border-blue-100">
@@ -477,6 +508,13 @@ function StudentDashboard() {
                       <button
                         disabled
                         className="mt-4 bg-red-400 text-white px-5 py-2 rounded-xl font-bold cursor-not-allowed"
+                      >
+                        Event Completed
+                      </button>
+                    ) : deadlinePassed ? (
+                      <button
+                        disabled
+                        className="mt-4 bg-red-500 text-white px-5 py-2 rounded-xl font-bold cursor-not-allowed"
                       >
                         Registration Closed
                       </button>
